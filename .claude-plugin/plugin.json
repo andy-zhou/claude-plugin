@@ -1,0 +1,11 @@
+{
+  "name": "subagent-analysis",
+  "version": "0.1.0",
+  "description": "Multi-persona expert review with structured output and synthesis",
+  "skills": [
+    {
+      "name": "subagent-analysis",
+      "path": "skills/subagent-analysis/SKILL.md"
+    }
+  ]
+}
