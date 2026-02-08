@@ -43,6 +43,11 @@ breaks, and how quickly can we recover?" For each component or decision, conside
 
 ## Sign-Off Rubric
 
+<!-- Calibration reference: In agent team mode, teammates generate their own
+rubrics during Step 5 (Rubric Hardening). These criteria serve as a reference
+for the expected depth and domain-specificity. In fallback mode, the lead may
+use these directly. -->
+
 ### Reject (any triggered → default reject)
 - Single point of failure with no redundancy or failover on a critical path
 - No observability (no metrics, logging, or tracing) for a production component

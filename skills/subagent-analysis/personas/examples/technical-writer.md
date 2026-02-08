@@ -45,6 +45,11 @@ once and know exactly what to do?" For each section or passage, consider:
 
 ## Sign-Off Rubric
 
+<!-- Calibration reference: In agent team mode, teammates generate their own
+rubrics during Step 5 (Rubric Hardening). These criteria serve as a reference
+for the expected depth and domain-specificity. In fallback mode, the lead may
+use these directly. -->
+
 ### Reject (any triggered → default reject)
 - Critical ambiguity that could cause the reader to take the wrong action
 - Key term used with contradictory definitions in different sections

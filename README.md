@@ -63,7 +63,7 @@ andys-skills/
 │       └── 2026-02-08-agent-teams-migration-design.md
 └── skills/
     └── subagent-analysis/
-        ├── SKILL.md               # Main skill: 8-step review workflow (agent teams + debate)
+        ├── SKILL.md               # Main skill: 9-step review workflow (agent teams + rubric hardening + debate)
         ├── analysis-schema.md     # Output schema for reviews + synthesis
         └── personas/
             └── examples/          # Reference persona templates (not used directly)
@@ -77,8 +77,11 @@ andys-skills/
 
 # Runtime output (in the project where the skill is invoked):
 # .subagent-analysis/{topic}/{run-id}/
+# ├── rubrics.md                   # Rubric decisions, challenges, and final criteria
 # ├── {persona-name}.md            # One review per persona
-# └── synthesis.md                 # Combined findings and recommendations
+# ├── synthesis.md                 # Combined findings and recommendations
+# └── decisions/                   # Decision documents from collaborative review
+#     └── {decision-slug}.md       # One per decision (accept/defer/reject)
 ```
 
 ## Modifying or Adding Skills

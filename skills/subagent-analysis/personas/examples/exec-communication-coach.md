@@ -46,6 +46,11 @@ For each section or decision point, consider:
 
 ## Sign-Off Rubric
 
+<!-- Calibration reference: In agent team mode, teammates generate their own
+rubrics during Step 5 (Rubric Hardening). These criteria serve as a reference
+for the expected depth and domain-specificity. In fallback mode, the lead may
+use these directly. -->
+
 ### Reject (any triggered → default reject)
 - No executive summary or the lead is buried beyond the first paragraph
 - Business impact not quantified or concretely described

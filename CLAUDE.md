@@ -6,7 +6,7 @@ This is a multi-skill Claude Code plugin repo. Each skill lives under `skills/{s
 
 The `subagent-analysis` skill brainstorms context-specific reviewer personas with the user, dispatches them as parallel teammates, facilitates debate, and synthesizes findings:
 
-- `SKILL.md` orchestrates the 8-step workflow (scope, brainstorm personas, align, dispatch, validate, debate, synthesize, act)
+- `SKILL.md` orchestrates the 9-step workflow (scope, brainstorm personas, align, dispatch, harden rubrics, write reviews, debate findings, synthesize, act)
 - Personas are generated dynamically based on the artifact and user concerns — not selected from a fixed list
 - Example persona templates in `personas/examples/` show the expected structure and depth for reference
 - `analysis-schema.md` enforces a consistent output format across all personas and the synthesis document

@@ -41,6 +41,11 @@ blast radius?" For each component or design decision, consider:
 
 ## Sign-Off Rubric
 
+<!-- Calibration reference: In agent team mode, teammates generate their own
+rubrics during Step 5 (Rubric Hardening). These criteria serve as a reference
+for the expected depth and domain-specificity. In fallback mode, the lead may
+use these directly. -->
+
 ### Reject (any triggered → default reject)
 - Unmitigated remote code execution or injection vector
 - Secrets (API keys, credentials, tokens) exposed in plaintext outside a secrets manager
