@@ -80,7 +80,7 @@ andys-skills/
                 ├── technical-writer.md
                 └── exec-communication-coach.md
 
-# Runtime output (in the project where the skill is invoked):
+# When you run the skill in another project, it creates the following output:
 # .subagent-analysis/{topic}/{run-id}/
 # ├── rubrics.md                   # Rubric decisions, challenges, and final criteria
 # ├── {persona-name}.md            # One review per persona
