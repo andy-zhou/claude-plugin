@@ -1,6 +1,9 @@
 ---
 name: subagent-analysis
 description: Use when you need to dispatch multiple expert personas to review a technical artifact (spec, PRD, RFC, design doc, codebase) and produce a structured synthesis of their findings with conflict resolution.
+user-invocable: true
+argument-hint: "[artifact-path]"
+allowed-tools: Read, Write, Bash, Glob, Grep, Task, AskUserQuestion
 ---
 
 # Multi-Persona Expert Analysis
@@ -11,10 +14,11 @@ structured reviews, and synthesize findings with domain-authority conflict resol
 ## Prerequisites
 
 Before starting, verify:
-1. The `analysis-schema.md` file exists at `skills/subagent-analysis/analysis-schema.md`
-   (relative to the plugin root)
-2. Persona templates exist in `skills/subagent-analysis/personas/`
+1. The `analysis-schema.md` file exists at `${CLAUDE_PLUGIN_ROOT}/skills/subagent-analysis/analysis-schema.md`
+2. Persona templates exist in `${CLAUDE_PLUGIN_ROOT}/skills/subagent-analysis/personas/`
 3. The target artifact is accessible (file path or inline content)
+
+If `$ARGUMENTS` is provided, treat it as the artifact path to review.
 
 ## Workflow
 
@@ -103,7 +107,9 @@ MUST happen in a single message (parallel execution).
 
 For each subagent:
 - `subagent_type`: Use the appropriate agent type (typically `general-purpose`)
-- Construct the prompt by reading the persona template and replacing placeholders:
+- Read the persona template from `${CLAUDE_PLUGIN_ROOT}/skills/subagent-analysis/personas/{persona-name}.md`
+- Read the schema from `${CLAUDE_PLUGIN_ROOT}/skills/subagent-analysis/analysis-schema.md`
+- Construct the prompt by replacing placeholders in the persona template:
   - `{ARTIFACT_CONTENT}` → full text of the artifact
   - `{ARTIFACT_TYPE}` → type identified in Step 1
   - `{TOPIC}` → topic slug from Step 1
