@@ -31,7 +31,11 @@ The `subagent-analysis` skill requires agent teams (experimental). Enable it by 
 }
 ```
 
-Without agent teams enabled, the skill falls back to Task-tool subagent dispatch (no debate phase).
+Without agent teams enabled, the skill falls back to Task-tool subagent dispatch.
+You still get parallel expert reviews, a synthesis with conflict resolution, and
+decision documents — but rubric hardening and inter-persona debate are skipped,
+so reviews use pre-assigned rubrics and conflicts are resolved by the lead rather
+than through reviewer discussion.
 
 ## Usage
 
