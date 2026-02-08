@@ -21,7 +21,8 @@ Before starting, verify:
 3. The target artifact is accessible (file path or inline content)
 4. Agent teams are enabled (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in settings or environment). If not enabled, inform the user how to enable it and fall back to Task-tool subagent dispatch (skip Step 6: Debate).
 
-If `$ARGUMENTS` is provided, treat it as the artifact path to review.
+If `$ARGUMENTS` is provided, treat it as the artifact path to review. If no
+argument is provided, ask the user for the artifact path using AskUserQuestion.
 
 ## Workflow
 
@@ -110,24 +111,38 @@ Before dispatching:
 ### Step 4: Create Agent Team and Dispatch Reviews
 
 Create an agent team with one teammate per persona defined in Step 2. The lead
-operates in delegate mode, focusing on orchestration rather than implementing.
+focuses on orchestration — do not write review files directly.
 
 **Agent team setup:**
-1. Ask Claude to create an agent team for multi-persona review
-2. Spawn one teammate per persona
-3. Enter delegate mode (Shift+Tab) so the lead coordinates without implementing
+1. Create an agent team using TeamCreate
+2. Spawn one teammate per persona using the Task tool with `team_name` set to the team name
+3. The lead should NOT write review files directly — the lead's role is to
+   dispatch, monitor, facilitate debate, and synthesize
+
+**Dispatch mode tracking:** Note which dispatch mode you used — this determines
+whether Step 6 (Debate) is required:
+- **Agent team mode** (TeamCreate + Task with `team_name`): Step 6 is **mandatory**
+- **Task-tool fallback** (Task without `team_name`, no TeamCreate): Step 6 is skipped
+
+If you called TeamCreate, you are in agent team mode. Both modes use the Task
+tool to spawn agents — the difference is whether a team exists.
 
 **For each teammate, construct a spawn prompt that includes:**
 - The persona definition from Step 2 (role, scope, analytical lens), formatted
   following the structure of examples in `${CLAUDE_PLUGIN_ROOT}/skills/subagent-analysis/personas/examples/`
 - The full analysis-schema.md content so the teammate has the schema without
-  needing to read files
+  needing to read files — do NOT reference the file by path; paste the content
+  and tell the teammate "follow the schema provided below"
 - The full artifact content with these context fields:
   - `{ARTIFACT_CONTENT}` → full text of the artifact
   - `{ARTIFACT_TYPE}` → type identified in Step 1
   - `{TOPIC}` → topic slug from Step 1
   - `{OUTPUT_PATH}` → path from Step 3
-  - `{REVIEW_CONTEXT}` → any relevant context from the brainstorming conversation
+  - `{REVIEW_CONTEXT}` → a 2-3 sentence summary of the user's stated concerns
+    and priorities from the brainstorming conversation, plus any specific
+    instructions about review focus
+- Replace all `{PLACEHOLDER}` tokens in the persona prompt with actual values
+  before sending — do not send literal placeholder strings
 - Instruction to write the review to the output path using the Write tool
 - Instruction to mark their review task as complete when done
 
@@ -148,10 +163,19 @@ After all teammates complete their review tasks:
    - Confidence value is one of: high, medium, low?
    - Assumptions section exists (even if "None")?
 3. If a review fails validation, note the issues but proceed (do not re-dispatch)
+4. If a teammate failed to produce any output (no file written, crash, timeout),
+   proceed with available reviews and note the missing persona in synthesis.
+   Do not block the workflow waiting indefinitely for a failed teammate.
 
 ### Step 6: Debate
 
-**Skip this step if using Task-tool fallback (agent teams not available).**
+**Decision gate:** Did you create an agent team in Step 4 (TeamCreate was called)?
+- **Yes → Execute this step.** Debate is mandatory when using agent teams.
+- **No (Task-tool fallback) → Skip to Step 7.**
+
+Do NOT skip this step if you created an agent team. The fact that you used the
+Task tool to spawn teammates does not make this a "Task-tool fallback" — if
+TeamCreate was called, you are in agent team mode and debate is required.
 
 After all reviews are written and validated, facilitate an inter-persona debate
 where teammates challenge each other's findings.
@@ -163,14 +187,17 @@ where teammates challenge each other's findings.
    disagree with or want to challenge."
 
 2. **Direct challenges**: Teammates message each other directly with challenges.
+   Each challenge should state: which finding is being challenged, the
+   counter-argument, and what evidence supports the challenger's position.
    Example: a security-focused reviewer messages an architecture reviewer —
    "Your recommendation to simplify the auth layer removes a defense-in-depth
    boundary."
 
 3. **Convergence detection**: The lead monitors the exchange and calls time after
-   either:
+   any of the following:
    - Each teammate has sent at least one round of challenges and responses, OR
-   - Two broadcast rounds have occurred without new substantive disagreements
+   - Two rounds have passed without new disagreements, OR
+   - **Three total rounds have elapsed** (hard cap — force convergence regardless)
 
 4. **Review updates**: After debate ends, each teammate gets a final task:
    "Update your review file if the debate changed any of your findings. Add a
@@ -244,8 +271,10 @@ After synthesis:
    - Open questions requiring human input
 2. Ask the user if they want to commit the analysis files. If yes, stage and commit
    all files in `.subagent-analysis/{topic}/{run-id}/` with message: `Add {topic} multi-persona analysis`
-3. Clean up the agent team: shut down all teammates, then ask the lead to clean up team resources
-4. Ask the user if they want to take action on any recommendations
+3. Ask the user if they want to take action on any recommendations
+4. Clean up the agent team: shut down all teammates, then delete the team.
+   Do this AFTER all user interaction is complete — the user may want a teammate
+   to help implement a recommendation.
 
 **Critical: Always clean up the agent team.** Shut down teammates before cleanup.
 Do not leave orphaned teammates running.
@@ -253,11 +282,19 @@ Do not leave orphaned teammates running.
 ## Fallback: Task-Tool Subagent Dispatch
 
 If agent teams are not available (feature not enabled or user declines), fall back
-to the original Task-tool approach:
+to the Task-tool-only approach. **This means: do NOT call TeamCreate. Do NOT set
+`team_name` on Task calls.** The distinction matters:
+
+| | Agent Team Mode | Task-Tool Fallback |
+|---|---|---|
+| TeamCreate called? | Yes | **No** |
+| Task `team_name` set? | Yes | **No** |
+| Debate (Step 6)? | **Mandatory** | Skipped |
+| Team cleanup (Step 8)? | Required | Not needed |
 
 - **Step 4 becomes**: Use the Task tool to dispatch one subagent per persona.
   ALL dispatches MUST happen in a single message (parallel execution).
-  Use `subagent_type: "general-purpose"` for each.
+  Use `subagent_type: "general-purpose"` for each. Do NOT use `team_name`.
 - **Step 6 is skipped**: No debate phase. Proceed directly to synthesis.
 - **Step 8**: No team cleanup needed.
 
@@ -279,3 +316,5 @@ All other steps remain the same.
 | Not cleaning up the agent team | Leaves orphaned teammates consuming resources | Always shut down teammates and clean up |
 | Teammates editing each other's reviews | Each persona owns their own file only | Teammates challenge via messaging, update only their own file |
 | Skipping Debate Notes after debate | Loses the record of what was challenged | Require the section even if "No challenges received" |
+| Creating agent team but skipping debate | Agent teams exist specifically to enable debate; skipping it defeats the purpose | If TeamCreate was called, Step 6 is mandatory — both paths use the Task tool, so "I used Task" is not a reason to skip debate |
+| Writing generic observations not grounded in the artifact | Reviews become unfalsifiable and useless | Cite specific sections, decisions, or quotes from the artifact |

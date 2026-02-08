@@ -53,7 +53,9 @@ You are reviewing the following artifact:
 
 ## Output Requirements
 
-Your output MUST follow the schema defined in `analysis-schema.md`:
+Your output MUST follow the schema provided below (the full schema will be
+inlined into your prompt at dispatch time — do not attempt to read
+`analysis-schema.md` as a file):
 - YAML frontmatter with persona, date, artifact, scope, sign-off, confidence
 - Sections: Summary, Analysis, Assumptions, Recommendations (P0/P1/P2), Sign-Off
 - Sign-off values: approve | conditional-approve | reject

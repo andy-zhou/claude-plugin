@@ -72,7 +72,7 @@ be resolved before production use.
 Numbered list. These are suggestions for improvement that are not blocking.
 
 ## Debate Notes
-Added after the debate phase (Step 7). Documents challenges received from other
+Added after the debate phase (Step 6). Documents challenges received from other
 personas, whether positions changed, and rationale. This section is REQUIRED
 after debate, even if no challenges were received (write "No challenges received").
 
