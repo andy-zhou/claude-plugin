@@ -41,6 +41,9 @@ Determine what artifact is being reviewed and what kind of review is needed.
 - Identify the artifact type (tech spec, PRD, RFC, code, design doc, etc.)
 - Derive a `{TOPIC}` slug in kebab-case (e.g., `kani-tech-spec`)
 
+If the artifact path is invalid or the file cannot be read, inform the user
+and ask for a corrected path using AskUserQuestion.
+
 ### Step 2: Brainstorm Personas with User
 
 Clarify scope, priorities, and review angles with the user through a
