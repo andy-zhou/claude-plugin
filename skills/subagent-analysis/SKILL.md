@@ -22,7 +22,7 @@ Before starting, verify:
 2. Example persona templates exist in `${CLAUDE_PLUGIN_ROOT}/skills/subagent-analysis/personas/examples/`
    (for reference only — personas are generated dynamically)
 3. The target artifact is accessible (file path or inline content)
-4. Agent teams are enabled (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in settings or environment). If not enabled, inform the user how to enable it and fall back to Task-tool subagent dispatch (skip Steps 5 and 7: Rubric Hardening and Findings Debate).
+4. Agent teams are enabled (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in settings or environment). If not enabled, inform the user how to enable it and do not proceed until it is configured.
 
 If `$ARGUMENTS` is provided, treat it as the artifact path to review. If no
 argument is provided, ask the user for the artifact path using AskUserQuestion.
@@ -136,7 +136,7 @@ Update this file after each step transition. Format:
 
 ```markdown
 ## Orchestration State
-- **Mode**: agent-team | fallback
+- **Mode**: agent-team
 - **Step**: <current step number and name>
 - **Teammates dispatched**: <list of persona names>
 - **Rubrics submitted**: <list of personas who have submitted> / <total>
@@ -161,18 +161,10 @@ focuses on orchestration — do not write review files directly.
    dispatch, monitor, facilitate debate, and synthesize
 
 **Handling dispatch failures:**
-- If TeamCreate fails, fall back to Task-tool dispatch mode and proceed with
-  the fallback workflow (skip Steps 5 and 7).
+- If TeamCreate fails, inform the user and do not proceed. Agent teams are
+  required for this skill.
 - If individual teammate spawns fail, proceed with the teammates that were
   successfully spawned and note the missing personas in the synthesis.
-
-**Dispatch mode tracking:** Note which dispatch mode you used — this determines
-whether Steps 5 (Rubric Debate) and 7 (Findings Debate) are required:
-- **Agent team mode** (TeamCreate + Task with `team_name`): Steps 5 and 7 are **mandatory**
-- **Task-tool fallback** (Task without `team_name`, no TeamCreate): Steps 5 and 7 are skipped
-
-If you called TeamCreate, you are in agent team mode. Both modes use the Task
-tool to spawn agents — the difference is whether a team exists.
 
 **For each teammate, construct a spawn prompt that includes:**
 - The persona definition from Step 2 (role, scope, analytical lens), formatted
@@ -222,11 +214,6 @@ content, which helps LLMs maintain focus on the review lens.
 not implement code. Plan approval adds friction with no benefit here.
 
 ### Step 5: Rubric Hardening
-
-**Decision gate:** Did you create an agent team in Step 4 (TeamCreate was called)?
-- **Yes → Execute this step.** Rubric hardening is mandatory when using agent teams.
-- **No (Task-tool fallback) → Skip to Step 6.** The lead assigns rubrics from
-  the example templates or generates them based on the persona definitions.
 
 **Wait for all teammates to message their draft rubrics before proceeding.**
 If a teammate has not responded after a reasonable period, message them to
@@ -300,12 +287,6 @@ process where teammates refine their criteria and challenge each other.
 └──────────┬───────────┘
            │
            ▼
-┌──────────────────────┐     ┌──────────────────────┐
-│  Agent team mode?    │─No─▶│  Skip to Step 6      │
-│  (TeamCreate called) │     │  (fallback mode)     │
-└──────────┬───────────┘     └──────────────────────┘
-           │ Yes
-           ▼
 ┌──────────────────────┐
 │  Draft rubrics:      │
 │  from domain         │
@@ -347,16 +328,11 @@ process where teammates refine their criteria and challenge each other.
 
 ### Step 6: Write and Validate Reviews
 
-**Agent team mode:** After rubrics are locked in Step 5, instruct each teammate
-to write their review. Include the teammate's finalized rubric criteria in the
-message so the rubric is in their recent context (it may have drifted out of
-attention after the multi-round hardening process). Each teammate writes to
-their output path from Step 3.
-
-**Fallback mode:** Teammates received their review instructions and rubric
-criteria in the dispatch prompt (Step 4). Step 6 for the orchestrator consists
-only of waiting for all Task-tool subagents to complete and then validating
-their output — there are no follow-up instructions to send.
+After rubrics are locked in Step 5, instruct each teammate to write their
+review. Include the teammate's finalized rubric criteria in the message so the
+rubric is in their recent context (it may have drifted out of attention after
+the multi-round hardening process). Each teammate writes to their output path
+from Step 3.
 
 After all teammates complete their review tasks:
 1. Read each persona's output file
@@ -366,7 +342,7 @@ After all teammates complete their review tasks:
    - Sign-off value is one of: approve, conditional-approve, reject?
    - Confidence value is one of: high, medium, low?
    - Assumptions section exists (even if "None")?
-   - Rubric Assessment criteria match the finalized rubric from Step 5 (or the rubric included in the dispatch prompt in fallback mode)?
+   - Rubric Assessment criteria match the finalized rubric from Step 5?
    Note: Debate Notes section is not expected at this stage — it will be added
    during Step 7. Do not flag its absence as a validation failure.
 3. If a review fails validation, note the issues but proceed (do not re-dispatch)
@@ -377,14 +353,6 @@ After all teammates complete their review tasks:
    user and ask whether to proceed with synthesis or re-run the analysis.
 
 ### Step 7: Findings Debate
-
-**Decision gate:** Did you create an agent team in Step 4 (TeamCreate was called)?
-- **Yes → Execute this step.** Debate is mandatory when using agent teams.
-- **No (Task-tool fallback) → Skip to Step 8.**
-
-Do NOT skip this step if you created an agent team. The fact that you used the
-Task tool to spawn teammates does not make this a "Task-tool fallback" — if
-TeamCreate was called, you are in agent team mode and debate is required.
 
 After all reviews are written and validated, facilitate an inter-persona debate
 where teammates challenge each other's findings.
@@ -440,12 +408,6 @@ where teammates challenge each other's findings.
 └──────────┬───────────┘
            │
            ▼
-┌──────────────────────┐     ┌──────────────────────┐
-│  Agent team mode?    │─No─▶│  Skip to Step 8      │
-│  (TeamCreate called) │     │  (fallback mode)     │
-└──────────┬───────────┘     └──────────────────────┘
-           │ Yes
-           ▼
 ┌──────────────────────┐
 │  Cross-review:       │
 │  read other reviews  │
@@ -496,9 +458,6 @@ Conflicts are primarily resolved through the debate phase. When personas disagre
 
 Do NOT use majority vote. A 2-1 outcome where the dissenting persona has the
 most relevant expertise is wrong.
-
-When debate was not conducted (Task-tool fallback), omit `Resolution-source` and
-resolve all conflicts via scope-based authority.
 
 ### Step 9: Review and Decide
 
@@ -558,35 +517,6 @@ confirmations, then delete. Do not call TeamDelete while teammates are still
 running — this can orphan processes. Do not leave teammates running without
 shutting them down.
 
-## Fallback: Task-Tool Subagent Dispatch
-
-If agent teams are not available (feature not enabled or user declines), fall back
-to the Task-tool-only approach. **This means: do NOT call TeamCreate. Do NOT set
-`team_name` on Task calls.** The distinction matters:
-
-| | Agent Team Mode | Task-Tool Fallback |
-|---|---|---|
-| TeamCreate called? | Yes | **No** |
-| Task `team_name` set? | Yes | **No** |
-| Rubric Hardening (Step 5)? | **Mandatory** | Skipped (lead assigns rubrics) |
-| Findings Debate (Step 7)? | **Mandatory** | Skipped |
-| Team cleanup (Step 9)? | Required | Not needed |
-
-- **Step 4 becomes**: Use the Task tool to dispatch one subagent per persona.
-  ALL dispatches MUST happen in a single message (parallel execution).
-  Use `subagent_type: "general-purpose"` for each. Do NOT use `team_name`.
-  Include rubric criteria in the spawn prompt (generated by the lead from
-  example templates or the persona definition).
-- **Step 5 is skipped**: No rubric debate. Lead assigns rubrics directly.
-  After dispatch, write a simplified `rubrics.md` with the assigned rubrics and
-  any user context from brainstorming, following the Rubrics Document Format in
-  the analysis schema with `mode: fallback`. No Decisions or Rubric Challenges
-  sections needed — just the Final Rubrics.
-- **Step 7 is skipped**: No findings debate. Proceed directly to synthesis.
-- **Step 9**: No team cleanup needed.
-
-All other steps remain the same.
-
 ## Common Mistakes
 
 | Mistake | Why it's wrong | What to do instead |
@@ -603,7 +533,6 @@ All other steps remain the same.
 | Not cleaning up the agent team | Leaves orphaned teammates consuming resources | Always shut down teammates and clean up |
 | Teammates editing each other's reviews | Each persona owns their own file only | Teammates challenge via messaging, update only their own file |
 | Skipping Debate Notes after debate | Loses the record of what was challenged | Require the section even if "No challenges received" |
-| Creating agent team but skipping rubric hardening or debate | Agent teams exist specifically to enable collaborative refinement; skipping it defeats the purpose | If TeamCreate was called, Steps 5 and 7 are mandatory — both paths use the Task tool, so "I used Task" is not a reason to skip |
 | Writing generic observations not grounded in the artifact | Reviews become unfalsifiable and useless | Cite specific sections, decisions, or quotes from the artifact |
 | Calling TeamDelete before teammates confirm shutdown | Can orphan running processes | Send shutdown requests, wait for all confirmations, then call TeamDelete |
 | Reading review files before teammates confirm updates are done | May capture incomplete Debate Notes or mid-write content | Wait for all teammates to mark their update task complete before reading files or starting synthesis |
