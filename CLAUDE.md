@@ -29,3 +29,9 @@ When adding a new skill, removing a skill, or changing the file structure, updat
 ## Historical Context
 
 `docs/implementation-plan.md` is the original build plan from initial development. It is archived and should not be treated as a live spec.
+
+`docs/plans/` contains design documents for subsequent changes:
+- `2026-02-08-agent-teams-migration-design.md` — migration from Task-tool subagents to agent teams
+- `2026-02-08-sign-off-rubrics-design.md` — per-persona sign-off rubrics with guided override model
+
+Both are marked `Status: Implemented` and describe the rationale behind their respective features.
