@@ -84,6 +84,7 @@ andys-skills/
 
 # When you run the skill in another project, it creates the following output:
 # .subagent-analysis/{topic}/{run-id}/
+# ├── state.md                     # Orchestration state tracker
 # ├── rubrics.md                   # Rubric decisions, challenges, and final criteria
 # ├── {persona-name}.md            # One review per persona
 # ├── synthesis.md                 # Combined findings and recommendations
