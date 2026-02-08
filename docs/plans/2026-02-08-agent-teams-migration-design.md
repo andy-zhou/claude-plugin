@@ -1,5 +1,11 @@
 # Design: Migrate subagent-analysis to Agent Teams
 
+**Status:** Implemented
+
+> **Note:** Step names and numbers in this document reflect the pre-rubric-hardening
+> workflow. See `2026-02-08-sign-off-rubrics-design.md` for the subsequent renumbering
+> that introduced Step 5 (Rubric Hardening) and shifted later steps.
+
 ## Summary
 
 Update the subagent-analysis skill to use Claude Code's experimental agent teams feature instead of Task-tool subagents. Add an inter-persona debate phase where teammates challenge each other's findings before synthesis.
