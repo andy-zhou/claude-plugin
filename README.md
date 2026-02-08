@@ -6,12 +6,40 @@ A Claude Code plugin hosting custom skills. Each skill lives under `skills/{skil
 
 - **subagent-analysis** — Brainstorms context-specific reviewer personas with the user, dispatches them as parallel teammates, facilitates inter-persona debate, and synthesizes findings with debate-first conflict resolution. Uses Claude Code agent teams (experimental) with Task-tool subagent fallback.
 
+## Installation
+
+Clone the repo, then register it as a Claude Code plugin marketplace:
+
+```bash
+git clone <repo-url> ~/workspace/andys-skills
+```
+
+In any Claude Code session:
+
+```
+/plugin marketplace add ~/workspace/andys-skills
+/plugin install subagent-analysis@andys-skills
+```
+
+The `subagent-analysis` skill requires agent teams (experimental). Enable it in your Claude Code settings or environment:
+
+```json
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
+```
+
+Without agent teams enabled, the skill falls back to Task-tool subagent dispatch (no debate phase).
+
 ## File Structure
 
 ```
 andys-skills/
 ├── .claude-plugin/
-│   └── plugin.json                # Plugin manifest for Claude Code discovery
+│   ├── plugin.json                # Plugin manifest for Claude Code discovery
+│   └── marketplace.json           # Marketplace definition for plugin installation
 ├── package.json                   # Node metadata (private, no deps)
 ├── CLAUDE.md                      # Session instructions for Claude Code
 ├── docs/

@@ -1,0 +1,14 @@
+{
+  "name": "andys-skills",
+  "owner": {
+    "name": "Andy Zhou"
+  },
+  "plugins": [
+    {
+      "name": "subagent-analysis",
+      "source": "./",
+      "description": "Multi-persona expert review with structured output and synthesis",
+      "version": "0.2.0"
+    }
+  ]
+}
