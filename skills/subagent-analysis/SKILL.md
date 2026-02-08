@@ -415,6 +415,13 @@ where teammates challenge each other's findings.
    A **round** is one cycle where each active participant has had the opportunity
    to send a challenge or response. Individual messages do not count as rounds.
 
+   **Design note:** This multi-condition protocol is intentional. Simplifying to
+   a single "wait for all, allow one round, call time" approach would force
+   unnecessary full rounds when no challenges exist and lose the ability to
+   distinguish a silent teammate (possible crash) from an explicit "no
+   challenges" response. The structured state file (state.md) helps the
+   orchestrator track per-participant status reliably.
+
 4. **Review updates**: After debate ends, each teammate gets a final task:
    "Update your review file if the debate changed any of your findings. Add a
    `## Debate Notes` section documenting what was challenged and whether you
