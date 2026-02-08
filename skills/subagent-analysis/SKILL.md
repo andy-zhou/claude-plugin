@@ -121,6 +121,25 @@ Before dispatching:
    value and the output filename.
 4. Read the full artifact content — teammates receive the FULL TEXT, not a file path
 
+**State tracking:** Throughout the workflow, maintain a running state file at
+`.subagent-analysis/{topic}/{run-id}/state.md` to track orchestration progress.
+Update this file after each step transition. Format:
+
+```markdown
+## Orchestration State
+- **Mode**: agent-team | fallback
+- **Step**: <current step number and name>
+- **Teammates dispatched**: <list of persona names>
+- **Rubrics submitted**: <list of personas who have submitted> / <total>
+- **Reviews written**: <list of personas with completed reviews> / <total>
+- **Debate status**: not-started | in-progress (round N/3) | complete
+- **Pending**: <what the orchestrator is waiting for>
+```
+
+This file serves as a re-grounding mechanism — before advancing to any step,
+read state.md to verify prerequisites are met. Teammates can also read this file
+to understand where the workflow stands.
+
 ### Step 4: Create Agent Team and Dispatch
 
 Create an agent team with one teammate per persona defined in Step 2. The lead

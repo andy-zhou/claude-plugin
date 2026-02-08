@@ -9,6 +9,7 @@ All analysis output is written to:
 
 ```
 .subagent-analysis/{topic}/{run-id}/
+├── state.md                # Orchestration state tracker (updated each step)
 ├── rubrics.md               # Rubric hardening decisions and final rubrics
 ├── {persona-name}.md        # One per dispatched persona
 ├── synthesis.md             # Generated after all reviews collected
