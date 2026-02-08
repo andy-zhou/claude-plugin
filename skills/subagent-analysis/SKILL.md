@@ -205,6 +205,11 @@ where teammates challenge each other's findings.
    changed your position. This section is required even if no challenges were
    received — write 'No challenges received' in that case."
 
+   **Wait for all teammates to confirm their review files are updated before
+   proceeding to Step 7.** Do not read review files or begin synthesis until
+   every teammate has marked their update task as complete. Reading files
+   mid-write risks capturing incomplete Debate Notes.
+
 ```
 ┌──────────────────────┐
 │  Reviews written     │
@@ -325,3 +330,4 @@ All other steps remain the same.
 | Creating agent team but skipping debate | Agent teams exist specifically to enable debate; skipping it defeats the purpose | If TeamCreate was called, Step 6 is mandatory — both paths use the Task tool, so "I used Task" is not a reason to skip debate |
 | Writing generic observations not grounded in the artifact | Reviews become unfalsifiable and useless | Cite specific sections, decisions, or quotes from the artifact |
 | Calling TeamDelete before teammates confirm shutdown | Can orphan running processes | Send shutdown requests, wait for all confirmations, then call TeamDelete |
+| Reading review files before teammates confirm updates are done | May capture incomplete Debate Notes or mid-write content | Wait for all teammates to mark their update task complete before reading files or starting synthesis |
