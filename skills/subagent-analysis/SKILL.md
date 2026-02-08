@@ -65,6 +65,12 @@ type and content. For example, a tech spec likely needs architecture, security,
 and operability perspectives. A pure API design doc likely needs design and
 security but not operability.
 
+When presenting inferred personas for confirmation, briefly explain why each
+was chosen for this artifact type and note any major angles that are not
+covered (e.g., "I did not include a security persona because this is a pure
+UI spec — add one if security is relevant"). This makes the confirmation step
+an effective quality gate rather than a rubber stamp.
+
 **Persona definition output:** For each persona, define:
 - **Name**: kebab-case slug (e.g., `security-engineer`, `data-architect`, `ml-reviewer`)
 - **Role**: one-line description of who this reviewer is
