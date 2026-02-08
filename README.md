@@ -60,7 +60,8 @@ andys-skills/
 ├── docs/
 │   ├── implementation-plan.md     # Historical: original build plan (archived)
 │   └── plans/
-│       └── 2026-02-08-agent-teams-migration-design.md
+│       ├── 2026-02-08-agent-teams-migration-design.md
+│       └── 2026-02-08-sign-off-rubrics-design.md
 └── skills/
     └── subagent-analysis/
         ├── SKILL.md               # Main skill: 9-step review workflow (agent teams + rubric hardening + debate)
