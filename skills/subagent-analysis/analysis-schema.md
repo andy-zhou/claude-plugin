@@ -165,7 +165,7 @@ For each disagreement between personas:
 - **Resolution**: Which persona's position takes precedence and why
 - **Resolution-source**: How the conflict was resolved:
   - `debate` — personas resolved it themselves during the debate phase
-  - `domain-authority` — unresolved in debate, resolved by the lead based on
+  - `scope-based` — unresolved in debate, resolved by the lead based on
     which persona's scope most directly covers the topic
   - `escalated` — unresolved, moved to Open Questions for human input
 - **Rationale**: Why that resolution was chosen

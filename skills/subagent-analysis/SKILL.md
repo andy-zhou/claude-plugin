@@ -482,7 +482,7 @@ Conflicts are primarily resolved through the debate phase. When personas disagre
 2. **Scope-based authority**: If the debate did not resolve the conflict, the lead
    determines which persona's defined scope most directly covers the disputed
    topic. That persona's position takes precedence. Note as
-   `Resolution-source: domain-authority`.
+   `Resolution-source: scope-based`.
 3. **Escalation**: If the conflict doesn't clearly fall under any persona's scope,
    or if it involves a genuine trade-off between domains, list it in Open Questions
    for human resolution. Note as `Resolution-source: escalated`.
