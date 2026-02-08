@@ -69,7 +69,11 @@ andys-skills/
             └── examples/          # Reference persona templates (not used directly)
                 ├── security-engineer.md
                 ├── principal-engineer.md
-                └── reliability-engineer.md
+                ├── reliability-engineer.md
+                ├── customer-advocate.md
+                ├── product-manager.md
+                ├── technical-writer.md
+                └── exec-communication-coach.md
 
 # Runtime output (in the project where the skill is invoked):
 # .subagent-analysis/{topic}/{run-id}/
