@@ -506,7 +506,8 @@ Present a summary to the user with:
 - Open questions requiring human input
 
 **9b. Collaborative review using brainstorming:**
-Use the `superpowers:brainstorming` skill to walk through the synthesis findings
+Use the `superpowers:brainstorming` skill (if available; otherwise, conduct the
+collaborative review as a standard brainstorming conversation) to walk through the synthesis findings
 with the user. Go through recommendations by priority (P0 first, then P1, then
 P2), and for each one:
 - Present the recommendation with its source persona(s) and evidence
