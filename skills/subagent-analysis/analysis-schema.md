@@ -38,6 +38,32 @@ confidence: <high | medium | low>
   - `approve` — No blocking issues found. Safe to proceed.
   - `conditional-approve` — Acceptable if P0/P1 recommendations are addressed.
   - `reject` — Blocking issues found. Do not proceed without resolution.
+  Sign-off is determined by the persona's sign-off rubric (see below). If the
+  actual sign-off differs from what the rubric produces, the Rubric Assessment
+  section must include an override justification.
+
+### Sign-Off Rubric Structure
+
+Each persona defines a sign-off rubric with 3-5 criteria per level, specific to
+their domain. The rubric is defined during brainstorming (Step 2) or in the
+persona template. Evaluation logic:
+
+- If **any** reject criterion is triggered → derived sign-off is `reject`
+- If **any** conditional criterion is triggered (and no reject) → derived sign-off is `conditional-approve`
+- If **all** approve criteria hold (and no reject/conditional triggers) → derived sign-off is `approve`
+
+The rubric is the default. If context warrants a different sign-off, the persona
+must explicitly justify the override in the Rubric Assessment section.
+
+```yaml
+sign-off-rubric:
+  reject:        # Any triggered → default reject
+    - "Criterion description"
+  conditional:   # Any triggered (no reject) → default conditional-approve
+    - "Criterion description"
+  approve:       # All must hold (no reject/conditional triggers)
+    - "Criterion description"
+```
 - `confidence` — Self-assessed confidence in the review. `low` means the reviewer
   lacked sufficient context or the artifact was ambiguous in areas relevant to scope.
 
@@ -71,6 +97,20 @@ be resolved before production use.
 ### P2 — Consider improving
 Numbered list. These are suggestions for improvement that are not blocking.
 
+## Rubric Assessment
+Evaluate each criterion from the persona's sign-off rubric against the findings.
+
+### Criteria Evaluated
+| Criterion | Level | Triggered | Evidence |
+|-----------|-------|-----------|----------|
+| <criterion text> | reject | Yes/No | <reference to finding or "N/A"> |
+| <criterion text> | conditional | Yes/No | <reference to finding or "N/A"> |
+| <criterion text> | approve | Yes/No | <reference to finding or "N/A"> |
+
+### Derived Sign-Off: <value produced mechanically from the rubric>
+### Actual Sign-Off: <value the persona is assigning>
+### Override Justification: <required ONLY if Derived ≠ Actual; omit if they match>
+
 ## Debate Notes
 Added after the debate phase (Step 6). Documents challenges received from other
 personas, whether positions changed, and rationale. This section is REQUIRED
@@ -79,7 +119,8 @@ after debate, even if no challenges were received (write "No challenges received
 If debate was not conducted (Task-tool fallback mode), omit this section entirely.
 
 ## Sign-Off
-Restate the sign-off value from frontmatter with a one-sentence justification.
+Restate the actual sign-off value from the Rubric Assessment with a one-sentence
+justification. This must match the Actual Sign-Off in the Rubric Assessment.
 ```
 
 ## Synthesis Document Format
@@ -104,7 +145,8 @@ overall-status: <approve | conditional-approve | reject>
 
 ```markdown
 ## Overall Status
-One paragraph summarizing the combined assessment.
+One paragraph summarizing the combined assessment. State which persona produced
+the most restrictive sign-off and which rubric criteria drove it.
 
 ## Consensus
 Bullet list of findings that all personas agree on.

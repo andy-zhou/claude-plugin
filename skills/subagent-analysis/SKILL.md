@@ -71,8 +71,13 @@ security but not operability.
 - **Scope**: what's in-scope and out-of-scope for this reviewer
 - **Analytical lens**: the core question this persona asks (e.g., "What can go
   wrong and what is the blast radius?" for security)
+- **Sign-off rubric**: 3-5 criteria per level (reject, conditional-approve, approve)
+  specific to this persona's domain and the artifact being reviewed. See the
+  Sign-Off Rubric sections in example personas for calibration and depth.
 
-Present the proposed personas to the user for confirmation before proceeding.
+Present the proposed personas (including their rubrics) to the user for
+confirmation before proceeding. The user may adjust rubric criteria — e.g.,
+"that reject criterion is too aggressive for this context."
 Reference example personas in `${CLAUDE_PLUGIN_ROOT}/skills/subagent-analysis/personas/examples/`
 for the expected structure and depth.
 
@@ -137,8 +142,9 @@ If you called TeamCreate, you are in agent team mode. Both modes use the Task
 tool to spawn agents — the difference is whether a team exists.
 
 **For each teammate, construct a spawn prompt that includes:**
-- The persona definition from Step 2 (role, scope, analytical lens), formatted
-  following the structure of examples in `${CLAUDE_PLUGIN_ROOT}/skills/subagent-analysis/personas/examples/`
+- The persona definition from Step 2 (role, scope, analytical lens, sign-off
+  rubric), formatted following the structure of examples in
+  `${CLAUDE_PLUGIN_ROOT}/skills/subagent-analysis/personas/examples/`
 - The full analysis-schema.md content so the teammate has the schema without
   needing to read files — do NOT reference the file by path; paste the content
   and tell the teammate "follow the schema provided below"
@@ -172,7 +178,7 @@ After all teammates complete their review tasks:
 1. Read each persona's output file
 2. Validate against the schema:
    - YAML frontmatter present with all required fields?
-   - All required sections present (Summary, Analysis, Assumptions, Recommendations, Sign-Off)?
+   - All required sections present (Summary, Analysis, Assumptions, Recommendations, Rubric Assessment, Sign-Off)?
    - Sign-off value is one of: approve, conditional-approve, reject?
    - Confidence value is one of: high, medium, low?
    - Assumptions section exists (even if "None")?
@@ -268,6 +274,11 @@ where teammates challenge each other's findings.
 ### Step 7: Synthesize
 
 Generate `.subagent-analysis/{topic}/{run-id}/synthesis.md` following the synthesis schema.
+
+**Rubric traceability:** In the Overall Status section, state which persona
+produced the most restrictive sign-off and which rubric criteria drove it. If
+any persona used an override (Actual ≠ Derived), note this in the synthesis
+so the reader can assess whether the override was justified.
 
 **Conflict Resolution — Debate First:**
 

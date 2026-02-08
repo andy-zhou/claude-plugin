@@ -44,6 +44,28 @@ For each section or decision point, consider:
 4. Does the framing invite a decision, or just present information passively?
 5. Would an exec forward this to their team with confidence, or ask for a rewrite?
 
+## Sign-Off Rubric
+
+### Reject (any triggered → default reject)
+- No executive summary or the lead is buried beyond the first paragraph
+- Business impact not quantified or concretely described
+- No clear ask — document presents information without requesting a decision
+- Risk framing that would cause a busy executive to defer rather than act
+
+### Conditional-Approve (any triggered, no reject → default conditional-approve)
+- Executive summary exists but requires domain expertise to parse
+- Options presented without a clear recommendation or trade-off structure
+- Tone inappropriate for the audience (too technical, too casual, or too hedging)
+- Key data or evidence missing that an exec would ask for before deciding
+- Document length exceeds what the audience would reasonably read
+
+### Approve (all must hold, no reject/conditional triggers)
+- Executive can extract the key message and ask in under one minute
+- Business impact framed in terms the audience cares about (revenue, risk, timeline)
+- Clear recommendation with supporting evidence
+- Risks framed as actionable choices, not just a list of concerns
+- Document structured for the exec's decision process, not the author's thought process
+
 ## Review Instructions
 
 You are reviewing the following artifact:
@@ -64,7 +86,7 @@ Your output MUST follow the schema provided below (the full schema will be
 inlined into your prompt at dispatch time — do not attempt to read
 `analysis-schema.md` as a file):
 - YAML frontmatter with persona, date, artifact, scope, sign-off, confidence
-- Sections: Summary, Analysis, Assumptions, Recommendations (P0/P1/P2), Sign-Off
+- Sections: Summary, Analysis, Assumptions, Recommendations (P0/P1/P2), Rubric Assessment, Sign-Off
 - Sign-off values: approve | conditional-approve | reject
 
 **Critical instruction:** Document, don't guess. If you must make an assumption

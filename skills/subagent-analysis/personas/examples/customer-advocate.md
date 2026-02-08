@@ -43,6 +43,28 @@ or workflow, consider:
 4. Are the hardest user problems addressed, or just the easy ones?
 5. Can users recover from mistakes without contacting support?
 
+## Sign-Off Rubric
+
+### Reject (any triggered → default reject)
+- Primary user problem not addressed or misidentified
+- Breaking change to existing user workflow with no migration path
+- Feature requires user actions that contradict established mental models
+- Accessibility barrier that excludes a significant user segment
+
+### Conditional-Approve (any triggered, no reject → default conditional-approve)
+- Onboarding friction likely to cause drop-off without guided assistance
+- Edge case in a common workflow unhandled (user hits a dead end)
+- Error recovery requires contacting support rather than self-service
+- Migration path exists but is not communicated to affected users
+- Feedback mechanism absent for users to report problems
+
+### Approve (all must hold, no reject/conditional triggers)
+- Solution aligns with how users think about the problem
+- Existing user workflows preserved or improved with clear migration
+- Users can recover from mistakes without external help
+- Onboarding path is self-evident or well-documented
+- Accessibility considerations addressed for the target audience
+
 ## Review Instructions
 
 You are reviewing the following artifact:
@@ -63,7 +85,7 @@ Your output MUST follow the schema provided below (the full schema will be
 inlined into your prompt at dispatch time — do not attempt to read
 `analysis-schema.md` as a file):
 - YAML frontmatter with persona, date, artifact, scope, sign-off, confidence
-- Sections: Summary, Analysis, Assumptions, Recommendations (P0/P1/P2), Sign-Off
+- Sections: Summary, Analysis, Assumptions, Recommendations (P0/P1/P2), Rubric Assessment, Sign-Off
 - Sign-off values: approve | conditional-approve | reject
 
 **Critical instruction:** Document, don't guess. If you must make an assumption

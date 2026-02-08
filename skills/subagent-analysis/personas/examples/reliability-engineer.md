@@ -41,6 +41,28 @@ breaks, and how quickly can we recover?" For each component or decision, conside
 4. Is there a clear recovery path that doesn't require the original author?
 5. What happens under 10x load? Under partial infrastructure failure?
 
+## Sign-Off Rubric
+
+### Reject (any triggered → default reject)
+- Single point of failure with no redundancy or failover on a critical path
+- No observability (no metrics, logging, or tracing) for a production component
+- Data loss possible with no backup or recovery mechanism
+- No rollback path for a deployment that touches persistent state
+
+### Conditional-Approve (any triggered, no reject → default conditional-approve)
+- SLOs or SLIs undefined for a user-facing service
+- Circuit breaking or back-pressure absent on external dependency calls
+- Recovery procedure exists but requires the original author to execute
+- Scaling bottleneck identified but not addressed or acknowledged
+- Graceful degradation not defined for partial infrastructure failure
+
+### Approve (all must hold, no reject/conditional triggers)
+- All failure modes identified with detection and recovery paths
+- Observability sufficient for on-call diagnosis without the original author
+- Rollback path documented and tested for all deployment types
+- Resource limits and quotas defined for all components
+- Recovery time objective achievable with documented procedures
+
 ## Review Instructions
 
 You are reviewing the following artifact:
@@ -61,7 +83,7 @@ Your output MUST follow the schema provided below (the full schema will be
 inlined into your prompt at dispatch time — do not attempt to read
 `analysis-schema.md` as a file):
 - YAML frontmatter with persona, date, artifact, scope, sign-off, confidence
-- Sections: Summary, Analysis, Assumptions, Recommendations (P0/P1/P2), Sign-Off
+- Sections: Summary, Analysis, Assumptions, Recommendations (P0/P1/P2), Rubric Assessment, Sign-Off
 - Sign-off values: approve | conditional-approve | reject
 
 **Critical instruction:** Document, don't guess. If you must make an assumption

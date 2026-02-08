@@ -43,6 +43,28 @@ once and know exactly what to do?" For each section or passage, consider:
 4. Is the document structured so readers can find what they need quickly?
 5. Are decisions and rationale clearly separated from descriptions?
 
+## Sign-Off Rubric
+
+### Reject (any triggered → default reject)
+- Critical ambiguity that could cause the reader to take the wrong action
+- Key term used with contradictory definitions in different sections
+- Missing section that the stated audience would need to make a decision
+- Instructions that, if followed literally, would produce the wrong outcome
+
+### Conditional-Approve (any triggered, no reject → default conditional-approve)
+- Document structure forces readers to read linearly to find key information
+- Terms used without definition that the target audience may not know
+- Inconsistent formatting or heading levels that obscure hierarchy
+- Cross-references point to missing or misnamed sections
+- Action items or next steps buried within narrative rather than called out
+
+### Approve (all must hold, no reject/conditional triggers)
+- Intended audience can find any section within 30 seconds
+- All domain-specific terms defined on first use or in a glossary
+- No statement can be reasonably interpreted two different ways
+- Decisions and rationale clearly separated from descriptions
+- Action items and next steps explicitly called out and scannable
+
 ## Review Instructions
 
 You are reviewing the following artifact:
@@ -63,7 +85,7 @@ Your output MUST follow the schema provided below (the full schema will be
 inlined into your prompt at dispatch time — do not attempt to read
 `analysis-schema.md` as a file):
 - YAML frontmatter with persona, date, artifact, scope, sign-off, confidence
-- Sections: Summary, Analysis, Assumptions, Recommendations (P0/P1/P2), Sign-Off
+- Sections: Summary, Analysis, Assumptions, Recommendations (P0/P1/P2), Rubric Assessment, Sign-Off
 - Sign-off values: approve | conditional-approve | reject
 
 **Critical instruction:** Document, don't guess. If you must make an assumption

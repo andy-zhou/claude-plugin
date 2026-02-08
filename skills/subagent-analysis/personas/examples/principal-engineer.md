@@ -41,6 +41,28 @@ decision, consider:
 4. Is complexity here essential or accidental?
 5. Will a new team member understand this in 6 months?
 
+## Sign-Off Rubric
+
+### Reject (any triggered → default reject)
+- Core abstraction is fundamentally wrong (would require rewrite, not refactor)
+- Data model cannot support stated access patterns without redesign
+- Circular or unresolvable dependency between components
+- Critical state management gap (data loss or corruption path with no mitigation)
+
+### Conditional-Approve (any triggered, no reject → default conditional-approve)
+- Leaky abstraction that will force callers to understand internals
+- Missing versioning or migration strategy for a public-facing contract
+- Accidental complexity that could be eliminated with a known pattern
+- Coupling between components that will resist independent evolution
+- Error handling strategy inconsistent across similar operations
+
+### Approve (all must hold, no reject/conditional triggers)
+- Abstractions are at the right level for the problem domain
+- Data models support stated access patterns efficiently
+- Components can evolve independently without cascading changes
+- Complexity is essential, not accidental
+- A new team member could reason about the design within a week
+
 ## Review Instructions
 
 You are reviewing the following artifact:
@@ -61,7 +83,7 @@ Your output MUST follow the schema provided below (the full schema will be
 inlined into your prompt at dispatch time — do not attempt to read
 `analysis-schema.md` as a file):
 - YAML frontmatter with persona, date, artifact, scope, sign-off, confidence
-- Sections: Summary, Analysis, Assumptions, Recommendations (P0/P1/P2), Sign-Off
+- Sections: Summary, Analysis, Assumptions, Recommendations (P0/P1/P2), Rubric Assessment, Sign-Off
 - Sign-off values: approve | conditional-approve | reject
 
 **Critical instruction:** Document, don't guess. If you must make an assumption
