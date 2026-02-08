@@ -287,6 +287,12 @@ process where teammates refine their criteria and challenge each other.
 └──────────┬───────────┘
            │
            ▼
+┌──────────────────────┐     ┌──────────────────────┐
+│  Agent team mode?    │─No─▶│  Skip to Step 6      │
+│  (TeamCreate called) │     │  (fallback mode)     │
+└──────────┬───────────┘     └──────────────────────┘
+           │ Yes
+           ▼
 ┌──────────────────────┐
 │  Draft rubrics:      │
 │  from domain         │
@@ -413,6 +419,12 @@ where teammates challenge each other's findings.
 │  (Step 6 complete)   │
 └──────────┬───────────┘
            │
+           ▼
+┌──────────────────────┐     ┌──────────────────────┐
+│  Agent team mode?    │─No─▶│  Skip to Step 8      │
+│  (TeamCreate called) │     │  (fallback mode)     │
+└──────────┬───────────┘     └──────────────────────┘
+           │ Yes
            ▼
 ┌──────────────────────┐
 │  Cross-review:       │
