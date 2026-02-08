@@ -50,7 +50,9 @@ reviewers then debate each other's findings. Finally, a synthesis document
 summarizes all findings, conflicts, and prioritized recommendations.
 
 Output is written to `.subagent-analysis/{topic}/{run-id}/` in your project
-directory, with one file per reviewer plus a `synthesis.md`.
+directory, with one file per reviewer plus a `synthesis.md`. Per-persona review
+files are detailed and structured for synthesis processing; the `synthesis.md`
+is the primary document for decision-making.
 
 ## File Structure
 
