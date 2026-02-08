@@ -1,7 +1,7 @@
 # Analysis Schema
 
 This document defines the required output format for all persona reviews and the
-synthesis document. Every subagent MUST follow this schema exactly.
+synthesis document. Every teammate MUST follow this schema exactly.
 
 ## Output Location
 
@@ -70,6 +70,13 @@ be resolved before production use.
 ### P2 — Consider improving
 Numbered list. These are suggestions for improvement that are not blocking.
 
+## Debate Notes
+Added after the debate phase (Step 7). Documents challenges received from other
+personas, whether positions changed, and rationale. This section is REQUIRED
+after debate, even if no challenges were received (write "No challenges received").
+
+If debate was not conducted (Task-tool fallback mode), omit this section entirely.
+
 ## Sign-Off
 Restate the sign-off value from frontmatter with a one-sentence justification.
 ```
@@ -77,7 +84,7 @@ Restate the sign-off value from frontmatter with a one-sentence justification.
 ## Synthesis Document Format
 
 The synthesis document (`.subagent-analysis/{topic}/synthesis.md`) is generated
-after all persona reviews are collected.
+after all persona reviews are collected (and after debate, if conducted).
 
 ### Frontmatter
 
@@ -107,9 +114,16 @@ Bullet list of findings that all personas agree on.
 For each disagreement between personas:
 - **Topic**: What the disagreement is about
 - **Positions**: What each persona said
-- **Resolution**: Which persona has domain authority over this topic and
-  therefore whose recommendation takes precedence
-- **Rationale**: Why that persona has authority
+- **Resolution**: Which persona's position takes precedence and why
+- **Resolution-source**: How the conflict was resolved:
+  - `debate` — personas resolved it themselves during the debate phase
+  - `domain-authority` — unresolved in debate, resolved by the lead based on
+    which persona's scope most directly covers the topic
+  - `escalated` — unresolved, moved to Open Questions for human input
+- **Rationale**: Why that resolution was chosen
+
+If debate was not conducted (Task-tool fallback), omit the Resolution-source
+field and resolve all conflicts via scope-based authority.
 
 If no conflicts, write "No conflicts identified."
 
@@ -126,6 +140,7 @@ Merged, deduplicated P2s from all personas. Attribute each to its source persona
 
 ## Open Questions
 Items that could not be resolved by any persona and require human input.
+Includes conflicts with Resolution-source: escalated.
 
 ## Next Steps
 Concrete, actionable items derived from the consolidated recommendations.

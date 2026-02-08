@@ -4,7 +4,7 @@ A Claude Code plugin hosting custom skills. Each skill lives under `skills/{skil
 
 ## Current Skills
 
-- **subagent-analysis** — Dispatches parallel expert-persona subagents (security engineer, principal engineer, reliability engineer) to review a technical artifact, then synthesizes findings with domain-authority conflict resolution.
+- **subagent-analysis** — Brainstorms context-specific reviewer personas with the user, dispatches them as parallel teammates, facilitates inter-persona debate, and synthesizes findings with debate-first conflict resolution. Uses Claude Code agent teams (experimental) with Task-tool subagent fallback.
 
 ## File Structure
 
@@ -15,15 +15,18 @@ andys-skills/
 ├── package.json                   # Node metadata (private, no deps)
 ├── CLAUDE.md                      # Session instructions for Claude Code
 ├── docs/
-│   └── implementation-plan.md     # Historical: original build plan (archived)
+│   ├── implementation-plan.md     # Historical: original build plan (archived)
+│   └── plans/
+│       └── 2026-02-08-agent-teams-migration-design.md
 └── skills/
     └── subagent-analysis/
-        ├── SKILL.md               # Main skill: 8-step review workflow
+        ├── SKILL.md               # Main skill: 8-step review workflow (agent teams + debate)
         ├── analysis-schema.md     # Output schema for reviews + synthesis
         └── personas/
-            ├── security-engineer.md
-            ├── principal-engineer.md
-            └── reliability-engineer.md
+            └── examples/          # Reference persona templates (not used directly)
+                ├── security-engineer.md
+                ├── principal-engineer.md
+                └── reliability-engineer.md
 ```
 
 ## Modifying or Adding Skills

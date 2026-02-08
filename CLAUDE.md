@@ -4,10 +4,11 @@ This is a multi-skill Claude Code plugin repo. Each skill lives under `skills/{s
 
 ## Architecture: subagent-analysis
 
-The `subagent-analysis` skill dispatches parallel expert-persona subagents to review technical artifacts:
+The `subagent-analysis` skill brainstorms context-specific reviewer personas with the user, dispatches them as parallel teammates, facilitates debate, and synthesizes findings:
 
-- `SKILL.md` orchestrates the 8-step workflow (scope, clarify, select, align, dispatch, validate, synthesize, act)
-- Persona templates in `personas/` define each reviewer's lens, scope boundaries, and analytical questions
+- `SKILL.md` orchestrates the 8-step workflow (scope, brainstorm personas, align, dispatch, validate, debate, synthesize, act)
+- Personas are generated dynamically based on the artifact and user concerns — not selected from a fixed list
+- Example persona templates in `personas/examples/` show the expected structure and depth for reference
 - `analysis-schema.md` enforces a consistent output format across all personas and the synthesis document
 
 ## Conventions
@@ -15,17 +16,11 @@ The `subagent-analysis` skill dispatches parallel expert-persona subagents to re
 - Each skill lives in `skills/{skill-name}/` with its own `SKILL.md`
 - subagent-analysis output goes to `.subagent-analysis/{topic}/` in whichever repo the skill is invoked from
 - Persona reviews use YAML frontmatter with sign-off (`approve | conditional-approve | reject`) and confidence levels
-- Synthesis uses domain-authority conflict resolution, not majority vote — the persona whose scope covers the disputed topic has authority
+- Conflicts are resolved debate-first; scope-based authority is the fallback when debate doesn't converge
 
 ## Modifying or Creating Skills
 
 Use the `superpowers:writing-skills` skill before editing any `SKILL.md`, persona template, or schema file. It enforces TDD for skill changes: define the failing case first, make the edit, then verify. Do not skip this — untested skill edits tend to introduce subtle regressions in agent behavior.
-
-## Adding Personas (subagent-analysis)
-
-1. Create a new `.md` file in `skills/subagent-analysis/personas/` following the existing template structure (Scope, Analytical Lens, Review Instructions, Output Requirements)
-2. Update the persona selection table in `skills/subagent-analysis/SKILL.md` (Step 3)
-3. Update the conflict resolution domain-authority table in SKILL.md (Step 7) if the new persona introduces new authority domains
 
 ## Stewardship
 
