@@ -264,9 +264,11 @@ process where teammates refine their criteria and challenge each other.
    of user intent that the orchestrator has. If the orchestrator doesn't have
    that understanding either, it should ask rather than guess.
 
-4. **Finalization**: After one round of challenges and any clarifications, each
-   teammate messages the orchestrator with their final rubric. The orchestrator
-   confirms all rubrics are locked before proceeding to reviews.
+4. **Finalization**: After one round of challenges (one cycle where each persona
+   has had the opportunity to challenge and respond — same definition as Step 7)
+   and any clarifications, each teammate messages the orchestrator with their
+   final rubric. The orchestrator confirms all rubrics are locked before
+   proceeding to reviews.
 
 5. **Write rubrics.md**: The orchestrator writes the rubric decision trail to
    `.subagent-analysis/{topic}/{run-id}/rubrics.md` following the Rubrics
