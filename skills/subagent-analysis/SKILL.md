@@ -191,6 +191,14 @@ tool to spawn agents — the difference is whether a team exists.
     instructions about review focus
 - Replace all `{PLACEHOLDER}` tokens in the persona prompt with actual values
   before sending — do not send literal placeholder strings
+
+**Pre-send verification checklist:** Before sending each teammate's spawn
+prompt, verify ALL of the following tokens have been replaced with actual values:
+- [ ] `{ARTIFACT_CONTENT}` → full artifact text from Step 1
+- [ ] `{ARTIFACT_TYPE}` → type identified in Step 1
+- [ ] `{TOPIC}` → topic slug from Step 1
+- [ ] `{OUTPUT_PATH}` → persona output path from Step 3
+- [ ] `{REVIEW_CONTEXT}` → summary of user concerns from Step 2
 - **Initial task: generate a draft rubric.** Do NOT instruct teammates to write
   reviews yet. Their first task is to propose their sign-off rubric based on
   their persona definition and domain expertise (before reading the artifact
