@@ -4,7 +4,7 @@ A Claude Code plugin hosting custom skills. Each skill lives under `skills/{skil
 
 ## Current Skills
 
-- **subagent-analysis** — Brainstorms context-specific reviewer personas with the user, dispatches them as parallel teammates, facilitates inter-persona debate, and synthesizes findings with debate-first conflict resolution. Uses Claude Code agent teams (experimental) with Task-tool subagent fallback.
+- **subagent-analysis** — Brainstorms context-specific reviewer personas with the user, dispatches them as parallel teammates, facilitates inter-persona debate, and synthesizes findings with debate-first conflict resolution. Requires Claude Code agent teams (experimental).
 
 ## Installation
 
@@ -31,11 +31,7 @@ The `subagent-analysis` skill requires agent teams (experimental). Enable it by 
 }
 ```
 
-Without agent teams enabled, the skill falls back to Task-tool subagent dispatch.
-You still get parallel expert reviews, a synthesis with conflict resolution, and
-decision documents — but rubric hardening and inter-persona debate are skipped,
-so reviews use pre-assigned rubrics and conflicts are resolved by the lead rather
-than through reviewer discussion.
+The skill will not proceed without agent teams enabled.
 
 ## Usage
 
@@ -45,9 +41,10 @@ than through reviewer discussion.
 
 After invocation, the skill will ask you 1-5 questions to shape the review
 personas (or you can say "just go" to skip). Once you confirm the personas,
-expert reviewers are dispatched in parallel. If agent teams are enabled, the
-reviewers then debate each other's findings. Finally, a synthesis document
-summarizes all findings, conflicts, and prioritized recommendations.
+expert reviewers are dispatched as parallel teammates. They harden their
+sign-off rubrics through cross-review, write independent reviews, then debate
+each other's findings. Finally, a synthesis document summarizes all findings,
+conflicts, and prioritized recommendations.
 
 Output is written to `.subagent-analysis/{topic}/{run-id}/` in your project
 directory, with one file per reviewer plus a `synthesis.md`. Per-persona review
