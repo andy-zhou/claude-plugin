@@ -21,7 +21,7 @@ In any Claude Code session:
 /plugin install subagent-analysis@andys-skills
 ```
 
-The `subagent-analysis` skill requires agent teams (experimental). Enable it in your Claude Code settings or environment:
+The `subagent-analysis` skill requires agent teams (experimental). Enable it by adding the following to your project's `.claude/settings.json` (or `~/.claude/settings.json` for global config):
 
 ```json
 {
@@ -32,6 +32,21 @@ The `subagent-analysis` skill requires agent teams (experimental). Enable it in 
 ```
 
 Without agent teams enabled, the skill falls back to Task-tool subagent dispatch (no debate phase).
+
+## Usage
+
+```
+/subagent-analysis path/to/my-spec.md
+```
+
+After invocation, the skill will ask you 1-5 questions to shape the review
+personas (or you can say "just go" to skip). Once you confirm the personas,
+expert reviewers are dispatched in parallel. If agent teams are enabled, the
+reviewers then debate each other's findings. Finally, a synthesis document
+summarizes all findings, conflicts, and prioritized recommendations.
+
+Output is written to `.subagent-analysis/{topic}/{run-id}/` in your project
+directory, with one file per reviewer plus a `synthesis.md`.
 
 ## File Structure
 
@@ -55,6 +70,11 @@ andys-skills/
                 ├── security-engineer.md
                 ├── principal-engineer.md
                 └── reliability-engineer.md
+
+# Runtime output (in the project where the skill is invoked):
+# .subagent-analysis/{topic}/{run-id}/
+# ├── {persona-name}.md            # One review per persona
+# └── synthesis.md                 # Combined findings and recommendations
 ```
 
 ## Modifying or Adding Skills

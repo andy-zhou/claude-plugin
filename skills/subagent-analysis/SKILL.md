@@ -8,6 +8,9 @@ allowed-tools: Read, Write, Bash, Glob, Grep, Task, AskUserQuestion
 
 # Multi-Persona Expert Analysis
 
+> This document is the orchestrating agent's playbook. For a user-facing overview,
+> see the README.
+
 Dispatch parallel expert-persona teammates to review a technical artifact, collect
 structured reviews, facilitate inter-persona debate, and synthesize findings with
 debate-first conflict resolution.
@@ -23,6 +26,10 @@ Before starting, verify:
 
 If `$ARGUMENTS` is provided, treat it as the artifact path to review. If no
 argument is provided, ask the user for the artifact path using AskUserQuestion.
+
+**Note:** The full artifact content is pasted into each teammate's spawn prompt.
+For very large artifacts that may exceed context limits, consider splitting into
+sections and running separate analyses per section.
 
 ## Workflow
 
@@ -106,6 +113,8 @@ Before dispatching:
 1. Generate a `{run-id}` timestamp in `YYYYMMDD-HHMMSS` format (e.g., `20260208-143052`)
 2. Create the output directory: `.subagent-analysis/{topic}/{run-id}/`
 3. Determine each persona's output path: `.subagent-analysis/{topic}/{run-id}/{persona-name}.md`
+   The persona name from Step 2 is used as both the YAML frontmatter `persona`
+   value and the output filename.
 4. Read the full artifact content — teammates receive the FULL TEXT, not a file path
 
 ### Step 4: Create Agent Team and Dispatch Reviews
@@ -149,6 +158,11 @@ tool to spawn agents — the difference is whether a team exists.
 **Critical: Full text, not file paths.** Teammates have their own context windows.
 Always paste the complete artifact content into the spawn prompt.
 
+**Recommended prompt ordering:** Persona definition first, then schema content,
+then review context, then artifact content, then dispatch instructions (output
+path and task completion). This ordering places role and constraints before the
+bulk content, which helps LLMs maintain focus on the review lens.
+
 **Do NOT require plan approval for teammates.** Their task is to write a review,
 not implement code. Plan approval adds friction with no benefit here.
 
@@ -166,6 +180,8 @@ After all teammates complete their review tasks:
 4. If a teammate failed to produce any output (no file written, crash, timeout),
    proceed with available reviews and note the missing persona in synthesis.
    Do not block the workflow waiting indefinitely for a failed teammate.
+   If the majority of dispatched personas failed to produce output, inform the
+   user and ask whether to proceed with synthesis or re-run the analysis.
 
 ### Step 6: Debate
 
@@ -187,17 +203,24 @@ where teammates challenge each other's findings.
    disagree with or want to challenge."
 
 2. **Direct challenges**: Teammates message each other directly with challenges.
-   Each challenge should state: which finding is being challenged, the
-   counter-argument, and what evidence supports the challenger's position.
+   Each challenge should include:
+   - **Challenged finding:** cite the specific finding being disputed
+   - **Counter-argument:** state the disagreement
+   - **Evidence:** cite artifact sections or reasoning that supports the challenge
+
    Example: a security-focused reviewer messages an architecture reviewer —
    "Your recommendation to simplify the auth layer removes a defense-in-depth
    boundary."
 
 3. **Convergence detection**: The lead monitors the exchange and calls time after
    any of the following:
-   - Each teammate has sent at least one round of challenges and responses, OR
+   - Each teammate has either sent at least one challenge or one full round has
+     elapsed since they received the cross-review task, OR
    - Two rounds have passed without new disagreements, OR
    - **Three total rounds have elapsed** (hard cap — force convergence regardless)
+
+   A **round** is one cycle where each active participant has had the opportunity
+   to send a challenge or response. Individual messages do not count as rounds.
 
 4. **Review updates**: After debate ends, each teammate gets a final task:
    "Update your review file if the debate changed any of your findings. Add a

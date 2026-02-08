@@ -95,12 +95,10 @@ topic: <topic slug>
 date: <YYYY-MM-DD>
 personas: [<list of persona names that contributed>]
 overall-status: <approve | conditional-approve | reject>
+# overall-status rule: use the most restrictive sign-off across all personas.
+# If any persona rejects → reject. If any conditionally approves → conditional-approve.
 ---
 ```
-
-`overall-status` is the most restrictive sign-off across all personas. If any
-persona rejects, overall is reject. If any conditionally approves, overall is
-conditional-approve.
 
 ### Required Sections
 
