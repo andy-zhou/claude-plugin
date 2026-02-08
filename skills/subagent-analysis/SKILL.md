@@ -295,9 +295,16 @@ process where teammates refine their criteria and challenge each other.
 
 ### Step 6: Write and Validate Reviews
 
-After rubrics are locked (or after Step 4 in fallback mode), instruct each
-teammate to write their review using their finalized rubric. Each teammate
-writes to their output path from Step 3.
+**Agent team mode:** After rubrics are locked in Step 5, instruct each teammate
+to write their review. Include the teammate's finalized rubric criteria in the
+message so the rubric is in their recent context (it may have drifted out of
+attention after the multi-round hardening process). Each teammate writes to
+their output path from Step 3.
+
+**Fallback mode:** Teammates received their review instructions and rubric
+criteria in the dispatch prompt (Step 4). Step 6 for the orchestrator consists
+only of waiting for all Task-tool subagents to complete and then validating
+their output — there are no follow-up instructions to send.
 
 After all teammates complete their review tasks:
 1. Read each persona's output file
@@ -307,7 +314,9 @@ After all teammates complete their review tasks:
    - Sign-off value is one of: approve, conditional-approve, reject?
    - Confidence value is one of: high, medium, low?
    - Assumptions section exists (even if "None")?
-   - Rubric Assessment criteria match the finalized rubric from Step 5?
+   - Rubric Assessment criteria match the finalized rubric from Step 5 (or the rubric included in the dispatch prompt in fallback mode)?
+   Note: Debate Notes section is not expected at this stage — it will be added
+   during Step 7. Do not flag its absence as a validation failure.
 3. If a review fails validation, note the issues but proceed (do not re-dispatch)
 4. If a teammate failed to produce any output (no file written, crash, timeout),
    proceed with available reviews and note the missing persona in synthesis.
