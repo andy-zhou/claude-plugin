@@ -157,6 +157,12 @@ focuses on orchestration — do not write review files directly.
 3. The lead should NOT write review files directly — the lead's role is to
    dispatch, monitor, facilitate debate, and synthesize
 
+**Handling dispatch failures:**
+- If TeamCreate fails, fall back to Task-tool dispatch mode and proceed with
+  the fallback workflow (skip Steps 5 and 7).
+- If individual teammate spawns fail, proceed with the teammates that were
+  successfully spawned and note the missing personas in the synthesis.
+
 **Dispatch mode tracking:** Note which dispatch mode you used — this determines
 whether Steps 5 (Rubric Debate) and 7 (Findings Debate) are required:
 - **Agent team mode** (TeamCreate + Task with `team_name`): Steps 5 and 7 are **mandatory**
