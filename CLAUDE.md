@@ -14,7 +14,7 @@ The `subagent-analysis` skill brainstorms context-specific reviewer personas wit
 ## Conventions
 
 - Each skill lives in `skills/{skill-name}/` with its own `SKILL.md`
-- subagent-analysis output goes to `.subagent-analysis/{topic}/` in whichever repo the skill is invoked from
+- subagent-analysis output goes to `.subagent-analysis/{topic}/{run-id}/` in whichever repo the skill is invoked from (run-id is a `YYYYMMDD-HHMMSS` timestamp)
 - Persona reviews use YAML frontmatter with sign-off (`approve | conditional-approve | reject`) and confidence levels
 - Conflicts are resolved debate-first; scope-based authority is the fallback when debate doesn't converge
 

@@ -102,9 +102,10 @@ for the expected structure and depth.
 ### Step 3: Align Output
 
 Before dispatching:
-1. Create the output directory: `.subagent-analysis/{topic}/`
-2. Determine each persona's output path: `.subagent-analysis/{topic}/{persona-name}.md`
-3. Read the full artifact content — teammates receive the FULL TEXT, not a file path
+1. Generate a `{run-id}` timestamp in `YYYYMMDD-HHMMSS` format (e.g., `20260208-143052`)
+2. Create the output directory: `.subagent-analysis/{topic}/{run-id}/`
+3. Determine each persona's output path: `.subagent-analysis/{topic}/{run-id}/{persona-name}.md`
+4. Read the full artifact content — teammates receive the FULL TEXT, not a file path
 
 ### Step 4: Create Agent Team and Dispatch Reviews
 
@@ -158,7 +159,7 @@ where teammates challenge each other's findings.
 **Debate protocol:**
 
 1. **Cross-review tasks**: Create a task for each teammate: "Read the other
-   personas' reviews in `.subagent-analysis/{topic}/` and identify findings you
+   personas' reviews in `.subagent-analysis/{topic}/{run-id}/` and identify findings you
    disagree with or want to challenge."
 
 2. **Direct challenges**: Teammates message each other directly with challenges.
@@ -211,7 +212,7 @@ where teammates challenge each other's findings.
 
 ### Step 7: Synthesize
 
-Generate `.subagent-analysis/{topic}/synthesis.md` following the synthesis schema.
+Generate `.subagent-analysis/{topic}/{run-id}/synthesis.md` following the synthesis schema.
 
 **Conflict Resolution — Debate First:**
 
@@ -241,8 +242,8 @@ After synthesis:
    - Count of P0/P1/P2 across all personas
    - Any conflicts and their resolutions (noting which were resolved by debate vs. authority)
    - Open questions requiring human input
-2. Stage and commit all files in `.subagent-analysis/{topic}/` with message:
-   `Add {topic} multi-persona analysis`
+2. Ask the user if they want to commit the analysis files. If yes, stage and commit
+   all files in `.subagent-analysis/{topic}/{run-id}/` with message: `Add {topic} multi-persona analysis`
 3. Clean up the agent team: shut down all teammates, then ask the lead to clean up team resources
 4. Ask the user if they want to take action on any recommendations
 
@@ -273,7 +274,7 @@ All other steps remain the same.
 | Skipping the Assumptions section | Silent assumptions hide risk | Require it even if "None" |
 | Summarizing the artifact for teammates | Lossy; teammates need full context | Send complete, untruncated text |
 | Re-dispatching on schema violation | Expensive and likely to produce similar issues | Note violations, proceed with synthesis |
-| Committing before validation | May commit malformed reviews | Validate first, then commit |
+| Committing before validation | May commit malformed reviews | Validate first, then ask user |
 | Requiring plan approval for teammates | Adds friction; teammates write reviews, not code | Do not require plan approval |
 | Not cleaning up the agent team | Leaves orphaned teammates consuming resources | Always shut down teammates and clean up |
 | Teammates editing each other's reviews | Each persona owns their own file only | Teammates challenge via messaging, update only their own file |

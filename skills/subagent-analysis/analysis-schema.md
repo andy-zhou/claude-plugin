@@ -8,13 +8,14 @@ synthesis document. Every teammate MUST follow this schema exactly.
 All analysis output is written to:
 
 ```
-.subagent-analysis/{topic}/
+.subagent-analysis/{topic}/{run-id}/
 ├── {persona-name}.md        # One per dispatched persona
 └── synthesis.md             # Generated after all reviews collected
 ```
 
 `{topic}` is a kebab-case slug derived from the artifact being reviewed (e.g.,
-`kani-tech-spec`, `auth-redesign-rfc`).
+`kani-tech-spec`, `auth-redesign-rfc`). `{run-id}` is a `YYYYMMDD-HHMMSS`
+timestamp so that subsequent runs on the same artifact don't overwrite each other.
 
 ## Per-Persona Review Format
 
@@ -83,7 +84,7 @@ Restate the sign-off value from frontmatter with a one-sentence justification.
 
 ## Synthesis Document Format
 
-The synthesis document (`.subagent-analysis/{topic}/synthesis.md`) is generated
+The synthesis document (`.subagent-analysis/{topic}/{run-id}/synthesis.md`) is generated
 after all persona reviews are collected (and after debate, if conducted).
 
 ### Frontmatter
