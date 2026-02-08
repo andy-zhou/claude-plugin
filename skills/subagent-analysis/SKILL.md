@@ -186,7 +186,9 @@ not implement code. Plan approval adds friction with no benefit here.
 - **No (Task-tool fallback) → Skip to Step 6.** The lead assigns rubrics from
   the example templates or generates them based on the persona definitions.
 
-After all teammates submit their draft rubrics, facilitate a rubric hardening
+**Wait for all teammates to message their draft rubrics before proceeding.**
+If a teammate has not responded after a reasonable period, message them to
+check status. Once all draft rubrics are in, facilitate a rubric hardening
 process where teammates refine their criteria and challenge each other.
 
 **Rubric hardening protocol:**
