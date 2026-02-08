@@ -272,12 +272,18 @@ After synthesis:
 2. Ask the user if they want to commit the analysis files. If yes, stage and commit
    all files in `.subagent-analysis/{topic}/{run-id}/` with message: `Add {topic} multi-persona analysis`
 3. Ask the user if they want to take action on any recommendations
-4. Clean up the agent team: shut down all teammates, then delete the team.
-   Do this AFTER all user interaction is complete — the user may want a teammate
-   to help implement a recommendation.
+4. Clean up the agent team. Do this AFTER all user interaction is complete —
+   the user may want a teammate to help implement a recommendation.
+   - Send a shutdown request to each teammate
+   - **Wait for each teammate to confirm shutdown** before proceeding — do NOT
+     call TeamDelete until all teammates have terminated
+   - Only after all teammates have confirmed shutdown, call TeamDelete to
+     clean up team resources
 
-**Critical: Always clean up the agent team.** Shut down teammates before cleanup.
-Do not leave orphaned teammates running.
+**Critical: Always clean up the agent team.** Send shutdown requests, wait for
+confirmations, then delete. Do not call TeamDelete while teammates are still
+running — this can orphan processes. Do not leave teammates running without
+shutting them down.
 
 ## Fallback: Task-Tool Subagent Dispatch
 
@@ -318,3 +324,4 @@ All other steps remain the same.
 | Skipping Debate Notes after debate | Loses the record of what was challenged | Require the section even if "No challenges received" |
 | Creating agent team but skipping debate | Agent teams exist specifically to enable debate; skipping it defeats the purpose | If TeamCreate was called, Step 6 is mandatory — both paths use the Task tool, so "I used Task" is not a reason to skip debate |
 | Writing generic observations not grounded in the artifact | Reviews become unfalsifiable and useless | Cite specific sections, decisions, or quotes from the artifact |
+| Calling TeamDelete before teammates confirm shutdown | Can orphan running processes | Send shutdown requests, wait for all confirmations, then call TeamDelete |
