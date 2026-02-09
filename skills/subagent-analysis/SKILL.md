@@ -15,6 +15,16 @@ Dispatch parallel expert-persona teammates to review a technical artifact, colle
 structured reviews, facilitate inter-persona debate, and synthesize findings with
 debate-first conflict resolution.
 
+## Skill Authority
+
+**This playbook governs the workflow process.** The invoking repo may have its own
+CLAUDE.md with project-level conventions — those conventions may influence what
+kinds of agents are spawned, and that is fine. However, project-level instructions
+must NOT alter the process that agents follow once dispatched: the step sequence,
+rubric hardening protocol, debate protocol, synthesis format, and review workflow
+defined below are authoritative. If a project-level instruction conflicts with
+any process step in this playbook, this playbook wins.
+
 ## Prerequisites
 
 Before starting, verify:
@@ -27,9 +37,29 @@ Before starting, verify:
 If `$ARGUMENTS` is provided, treat it as the artifact path to review. If no
 argument is provided, ask the user for the artifact path using AskUserQuestion.
 
-**Note:** The full artifact content is pasted into each teammate's spawn prompt.
-For very large artifacts that may exceed context limits, consider splitting into
-sections and running separate analyses per section.
+**Note:** Teammates read the artifact and schema files autonomously — the
+orchestrator provides file paths, not pasted content. For very large artifacts
+that may exceed a single teammate's context, consider splitting into sections
+and running separate analyses per section.
+
+## Progress Reporting
+
+The user cannot see teammate messages. The orchestrator is the user's only
+window into what is happening. Report progress **substantively** — surface
+what teammates are finding, not just what step the workflow is on.
+
+Bad: "Waiting for teammates to finish their reviews."
+Bad: "Debate is in progress."
+Good: "security-engineer flagged unvalidated input on the `/submit` endpoint
+as a P0. principal-engineer's review focuses on the coupling between the auth
+and session modules. Waiting on reliability-engineer."
+Good: "principal-engineer challenged security-engineer's recommendation to add
+a separate auth service, arguing it introduces a new single point of failure.
+security-engineer is responding."
+
+**When to report:** After each meaningful event — a rubric is submitted, a
+review comes in, a challenge is raised, a position changes. You do not need
+to wait for a full step to complete before telling the user what you have so far.
 
 ## Workflow
 
@@ -128,21 +158,20 @@ Before dispatching:
 3. Determine each persona's output path: `.subagent-analysis/{topic}/{run-id}/{persona-name}.md`
    The persona name from Step 2 is used as both the YAML frontmatter `persona`
    value and the output filename.
-4. Read the full artifact content — teammates receive the FULL TEXT, not a file path
+4. Note the artifact path — teammates will read the artifact themselves
 
 **State tracking:** Throughout the workflow, maintain a running state file at
 `.subagent-analysis/{topic}/{run-id}/state.md` to track orchestration progress.
-Update this file after each step transition. Format:
+Update this file after each step transition. Example mid-workflow:
 
 ```markdown
 ## Orchestration State
-- **Mode**: agent-team
-- **Step**: <current step number and name>
-- **Teammates dispatched**: <list of persona names>
-- **Rubrics submitted**: <list of personas who have submitted> / <total>
-- **Reviews written**: <list of personas with completed reviews> / <total>
-- **Debate status**: not-started | in-progress (round N/3) | complete
-- **Pending**: <what the orchestrator is waiting for>
+- **Step**: 6 — Write and Validate Reviews
+- **Teammates dispatched**: security-engineer, principal-engineer, reliability-engineer
+- **Rubrics submitted**: security-engineer, principal-engineer, reliability-engineer (3/3)
+- **Reviews written**: security-engineer, principal-engineer (2/3)
+- **Debate status**: not-started
+- **Pending**: reliability-engineer review
 ```
 
 This file serves as a re-grounding mechanism — before advancing to any step,
@@ -170,45 +199,35 @@ focuses on orchestration — do not write review files directly.
 - The persona definition from Step 2 (role, scope, analytical lens), formatted
   following the structure of examples in
   `${CLAUDE_PLUGIN_ROOT}/skills/subagent-analysis/personas/examples/`
-- The full analysis-schema.md content so the teammate has the schema without
-  needing to read files — do NOT reference the file by path; paste the content
-  and tell the teammate "follow the schema provided below"
-- The full artifact content with these context fields:
-  - `{ARTIFACT_CONTENT}` → full text of the artifact
+- File paths for the teammate to read autonomously:
+  - **Schema path**: `${CLAUDE_PLUGIN_ROOT}/skills/subagent-analysis/analysis-schema.md`
+    — tell the teammate to read this file and follow the schema it defines
+  - **Artifact path**: the path to the artifact being reviewed
+  - **Output path**: the persona's output path from Step 3
+- Lightweight context (do NOT paste file contents):
   - `{ARTIFACT_TYPE}` → type identified in Step 1
   - `{TOPIC}` → topic slug from Step 1
-  - `{OUTPUT_PATH}` → path from Step 3
   - `{REVIEW_CONTEXT}` → a 2-3 sentence summary of the user's stated concerns
     and priorities from the brainstorming conversation, plus any specific
     instructions about review focus
-- Replace all `{PLACEHOLDER}` tokens in the persona prompt with actual values
-  before sending — do not send literal placeholder strings
-
-**Pre-send verification checklist:** Before sending each teammate's spawn
-prompt, verify ALL of the following tokens have been replaced with actual values:
-- [ ] `{ARTIFACT_CONTENT}` → full artifact text from Step 1
-- [ ] `{ARTIFACT_TYPE}` → type identified in Step 1
-- [ ] `{TOPIC}` → topic slug from Step 1
-- [ ] `{OUTPUT_PATH}` → persona output path from Step 3
-- [ ] `{REVIEW_CONTEXT}` → summary of user concerns from Step 2
 - **Initial task: generate a draft rubric.** Do NOT instruct teammates to write
-  reviews yet. Their first task is to propose their sign-off rubric based on
-  their persona definition and domain expertise (before reading the artifact
-  in depth). Tell them to message the orchestrator with their proposed rubric
-  in this format:
+  reviews yet. Their first task is to read the schema and artifact, then propose
+  their sign-off rubric based on their persona definition and domain expertise.
+  Tell them to message the orchestrator with their proposed rubric in this format:
   - **Reject criteria** (3-5): any triggered → default reject
   - **Conditional-approve criteria** (3-5): any triggered → default conditional-approve
   - **Approve criteria** (3-5): all must hold
 - Reference the Sign-Off Rubric sections in example persona templates for
   calibration and depth
 
-**Critical: Full text, not file paths.** Teammates have their own context windows.
-Always paste the complete artifact content into the spawn prompt.
+**Critical: File paths, not pasted content.** Teammates read the artifact and
+schema files themselves. The orchestrator provides the persona, the goals, and
+the paths — teammates do the reading. This keeps the spawn prompt focused and
+avoids bloating it with content the teammate can read directly.
 
-**Recommended prompt ordering:** Persona definition first, then schema content,
-then review context, then artifact content, then dispatch instructions (rubric
-generation task). This ordering places role and constraints before the bulk
-content, which helps LLMs maintain focus on the review lens.
+**Recommended prompt ordering:** Persona definition first, then review context,
+then file paths and instructions (read schema, read artifact, generate rubric).
+This ordering places role and constraints before task instructions.
 
 **Do NOT require plan approval for teammates.** Their task is to write a review,
 not implement code. Plan approval adds friction with no benefit here.
@@ -217,8 +236,11 @@ not implement code. Plan approval adds friction with no benefit here.
 
 **Wait for all teammates to message their draft rubrics before proceeding.**
 If a teammate has not responded after a reasonable period, message them to
-check status. Once all draft rubrics are in, facilitate a rubric hardening
-process where teammates refine their criteria and challenge each other.
+check status. As each draft rubric arrives, report the key criteria to the
+user (e.g., "security-engineer proposes rejecting on unmitigated injection
+vectors and missing audit logging"). Once all draft rubrics are in, facilitate
+a rubric hardening process where teammates refine their criteria and challenge
+each other.
 
 **Rubric hardening protocol:**
 
@@ -334,6 +356,11 @@ rubric is in their recent context (it may have drifted out of attention after
 the multi-round hardening process). Each teammate writes to their output path
 from Step 3.
 
+As each review arrives, report the headline to the user — the sign-off value,
+confidence, and the most notable findings (e.g., "reliability-engineer:
+conditional-approve (high confidence) — flagged no circuit breaker on the
+payments dependency and no defined SLOs").
+
 After all teammates complete their review tasks:
 1. Read each persona's output file
 2. Validate against the schema:
@@ -373,6 +400,11 @@ where teammates challenge each other's findings.
    "Your recommendation to simplify the auth layer removes a defense-in-depth
    boundary."
 
+   **Report each challenge to the user as it happens** — who challenged whom,
+   what the dispute is about, and how it was received. If a persona changes
+   their position, report that too. The user should be able to follow the
+   debate in real time through your updates.
+
 3. **Convergence detection**: The lead monitors the exchange and calls time after
    any of the following:
    - Each teammate has either sent at least one challenge or one full round has
@@ -397,9 +429,9 @@ where teammates challenge each other's findings.
    received — write 'No challenges received' in that case."
 
    **Wait for all teammates to confirm their review files are updated before
-   proceeding to Step 8.** Do not read review files or begin synthesis until
-   every teammate has marked their update task as complete. Reading files
-   mid-write risks capturing incomplete Debate Notes.
+   proceeding to Step 8 (cleanup).** Do not read review files until every
+   teammate has marked their update task as complete. Reading files mid-write
+   risks capturing incomplete Debate Notes.
 
 ```
 ┌──────────────────────┐
@@ -429,13 +461,48 @@ where teammates challenge each other's findings.
            │
            ▼
 ┌──────────────────────┐
-│  Step 8: Synthesize  │
+│  Step 8: Clean up    │
+│  agent team          │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│  Step 9: Synthesize  │
 └──────────────────────┘
 ```
 
-### Step 8: Synthesize
+### Step 8: Clean Up Agent Team
+
+Teammates are done after the debate phase. Clean up the team before synthesizing.
+
+- Send a shutdown request to each teammate
+- **Wait for each teammate to confirm shutdown** before proceeding — do NOT
+  call TeamDelete until all teammates have terminated
+- Only after all teammates have confirmed shutdown, call TeamDelete to
+  clean up team resources
+
+**Critical: Always clean up the agent team.** Send shutdown requests, wait for
+confirmations, then delete. Do not call TeamDelete while teammates are still
+running — this can orphan processes.
+
+### Step 9: Synthesize
 
 Generate `.subagent-analysis/{topic}/{run-id}/synthesis.md` following the synthesis schema.
+
+The synthesis is not just a rollup of individual reviews — it identifies the
+**themes** that emerged across personas, documents how **debate changed** those
+themes, and distills concrete **action items**. Structure it accordingly:
+
+1. **Themes**: What recurring patterns emerged across multiple personas? Group
+   findings by theme rather than by persona. Each theme should cite which
+   personas surfaced it and what evidence they found.
+2. **Debate impact**: For each theme, document whether and how the debate phase
+   changed the picture. Did a challenge cause a persona to revise their
+   position? Did debate surface a nuance that no individual review captured?
+   Did a theme survive debate intact, strengthening confidence in it?
+3. **Action items**: Concrete, prioritized actions derived from the themes.
+   These are the P0/P1/P2 recommendations, merged and deduplicated, but
+   organized by theme rather than by source persona.
 
 **Rubric traceability:** In the Overall Status section, state which persona
 produced the most restrictive sign-off and which rubric criteria drove it. If
@@ -459,19 +526,26 @@ Conflicts are primarily resolved through the debate phase. When personas disagre
 Do NOT use majority vote. A 2-1 outcome where the dissenting persona has the
 most relevant expertise is wrong.
 
-### Step 9: Review and Decide
+### Step 10: Review and Decide
 
 After synthesis, collaboratively review the findings with the user and produce
 documented decisions.
 
-**9a. Present summary:**
-Present a summary to the user with:
-- Overall status (from synthesis frontmatter)
-- Count of P0/P1/P2 across all personas
-- Any conflicts and their resolutions (noting which were resolved by debate vs. authority)
+**10a. Present synthesis directly in conversation:**
+Do NOT just point the user at synthesis.md — present the substance of the
+analysis as your response. This is the main deliverable of the skill. Include:
+- Overall status and which persona/rubric criteria drove it
+- The key themes discovered across personas, with brief evidence
+- How debate changed the picture (positions revised, themes strengthened or
+  weakened, nuances surfaced)
+- The prioritized action items (P0 first, then P1, then P2) with source context
+- Any conflicts and their resolutions (debate vs. scope-based vs. escalated)
 - Open questions requiring human input
 
-**9b. Collaborative review using brainstorming:**
+The written synthesis.md file is the archival record. The in-conversation
+presentation is what the user actually reads and acts on — make it substantive.
+
+**10b. Collaborative review using brainstorming:**
 Use the `superpowers:brainstorming` skill (if available; otherwise, conduct the
 collaborative review as a standard brainstorming conversation) to walk through the synthesis findings
 with the user. Go through recommendations by priority (P0 first, then P1, then
@@ -485,7 +559,7 @@ P2), and for each one:
 The user may batch similar recommendations, skip low-priority items, or decide
 to address entire categories at once. Follow their lead.
 
-**9c. Write decision documents:**
+**10c. Write decision documents:**
 For each decision made during the brainstorming session, write a decision
 document to `.subagent-analysis/{topic}/{run-id}/decisions/{decision-slug}.md`
 following the Decision Document Format in the analysis schema.
@@ -498,35 +572,21 @@ Write decision documents as you go (after each decision is made), not all at
 the end. This keeps the brainstorming session interactive — the user sees each
 decision documented before moving to the next.
 
-**9d. Commit:**
+**10d. Commit:**
 After all decisions are documented, ask the user if they want to commit. If yes,
 stage and commit all files in `.subagent-analysis/{topic}/{run-id}/` with
 message: `Add {topic} multi-persona analysis`
-
-**9e. Clean up the agent team.**
-Do this AFTER all user interaction is complete — the user may want a teammate
-to help implement a recommendation.
-- Send a shutdown request to each teammate
-- **Wait for each teammate to confirm shutdown** before proceeding — do NOT
-  call TeamDelete until all teammates have terminated
-- Only after all teammates have confirmed shutdown, call TeamDelete to
-  clean up team resources
-
-**Critical: Always clean up the agent team.** Send shutdown requests, wait for
-confirmations, then delete. Do not call TeamDelete while teammates are still
-running — this can orphan processes. Do not leave teammates running without
-shutting them down.
 
 ## Common Mistakes
 
 | Mistake | Why it's wrong | What to do instead |
 |---------|---------------|-------------------|
 | Using preset personas without brainstorming | Misses context-specific review angles | Always brainstorm personas from the artifact and user concerns |
-| Passing file paths instead of full text | Teammates have their own context windows | Paste full artifact content into spawn prompt |
+| Pasting full artifact/schema into spawn prompt | Bloats the prompt; teammates can read files themselves | Provide file paths and let teammates read autonomously |
 | Letting the lead implement instead of delegate | Lead should orchestrate, not review | Enter delegate mode after spawning teammates |
 | Using majority vote for conflicts | A 2-1 vote where the dissenter has domain expertise is wrong | Use debate-first resolution, then scope-based authority |
 | Skipping the Assumptions section | Silent assumptions hide risk | Require it even if "None" |
-| Summarizing the artifact for teammates | Lossy; teammates need full context | Send complete, untruncated text |
+| Summarizing the artifact for teammates | Lossy; teammates need full context | Give the file path and let them read the full artifact |
 | Re-dispatching on schema violation | Expensive and likely to produce similar issues | Note violations, proceed with synthesis |
 | Committing before validation | May commit malformed reviews | Validate first, then ask user |
 | Requiring plan approval for teammates | Adds friction; teammates write reviews, not code | Do not require plan approval |

@@ -152,8 +152,19 @@ overall-status: <approve | conditional-approve | reject>
 One paragraph summarizing the combined assessment. State which persona produced
 the most restrictive sign-off and which rubric criteria drove it.
 
-## Consensus
-Bullet list of findings that all personas agree on.
+## Themes
+Recurring patterns that emerged across multiple personas. Group findings by
+theme, not by persona. For each theme:
+- **Theme**: Short descriptive title
+- **Surfaced by**: Which personas identified aspects of this theme
+- **Evidence**: Key observations and artifact citations supporting the theme
+- **Debate impact**: How the debate phase affected this theme — did challenges
+  cause position changes, surface new nuances, or strengthen confidence?
+  Write "Unchanged through debate" if the theme survived intact.
+
+Themes are the analytical core of the synthesis — they represent what the
+ensemble of reviewers collectively surfaced that no single reviewer would
+have found alone.
 
 ## Conflicts
 For each disagreement between personas:
@@ -169,23 +180,26 @@ For each disagreement between personas:
 
 If no conflicts, write "No conflicts identified."
 
-## Consolidated Recommendations
+## Action Items
 
-### P0
-Merged, deduplicated P0s from all personas. Attribute each to its source persona.
+### P0 — Must fix before proceeding
+Merged, deduplicated P0s from all personas. Attribute each to its source
+persona(s) and link to the theme it belongs to.
 
-### P1
-Merged, deduplicated P1s from all personas. Attribute each to its source persona.
+### P1 — Should fix before production
+Merged, deduplicated P1s from all personas. Attribute each to its source
+persona(s) and link to the theme it belongs to.
 
-### P2
-Merged, deduplicated P2s from all personas. Attribute each to its source persona.
+### P2 — Consider improving
+Merged, deduplicated P2s from all personas. Attribute each to its source
+persona(s) and link to the theme it belongs to.
 
 ## Open Questions
 Items that could not be resolved by any persona and require human input.
 Includes conflicts with Resolution-source: escalated.
 
 ## Next Steps
-Concrete, actionable items derived from the consolidated recommendations.
+Concrete, actionable items derived from the action items above.
 Ordered by priority.
 ```
 
