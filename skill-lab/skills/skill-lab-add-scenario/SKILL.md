@@ -94,6 +94,13 @@ Include:
 3. **Rubric** — caught/partial/missed criteria for each trap with clear triggering behaviors
 4. **Behavior rules** — how to interact with the skill tester (if interactive): what to reveal when asked, what to withhold, how to respond to wrong conclusions
 
+### `skill-tester-context-briefing.md` (required)
+
+The target task and domain context for the skill tester. This is what the skill tester sees as its assignment — it should read like a real user request, not an obvious test. Include:
+1. **Task description** — the work from Step 3 that drives the skill tester through the traps
+2. **Domain context** — enough background for the task to feel realistic
+3. **Any scenario-specific inputs** — file paths, API details, constraints the skill tester needs to know
+
 ### Additional fixture files
 
 As needed by the scenario:

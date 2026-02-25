@@ -10,7 +10,7 @@ Read the skill at `{{SKILL_PATH}}` first — start with SKILL.md. Follow its ins
 
 - **Output directory:** `{{OUTPUT_DIR}}`
 
-{{SKILL_TESTER_CONTEXT}}
+{{SKILL_TESTER_CONTEXT_BRIEFING}}
 
 ## Output Logging
 

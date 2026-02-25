@@ -5,12 +5,18 @@
 # fixture dir becomes a {{*_BRIEFING}} variable. E.g., evaluator-briefing.md
 # becomes {{EVALUATOR_BRIEFING}}. Uppercased, hyphens to underscores.
 #
+# Phase 1c (config substitution): Reads config.yml and maps section.key entries
+# to {{SECTION_KEY}} placeholders. E.g., skill.path -> {{SKILL_PATH}}.
+#
 # Phase 2 (string substitution): Standard vars (OUTPUT_DIR, EXPERIMENT_DIR,
 # FIXTURE_DIR, SPAWN_DIR) plus any KEY=VALUE pairs from .fixture-env.
 # Env vars override hardcoded defaults.
 #
 # Phase 3 (env var sweep): Any remaining {{VAR}} patterns are replaced with
-# matching env vars. Unreplaced patterns trigger a warning.
+# matching env vars. Unreplaced embedded patterns trigger a warning.
+#
+# Phase 4 (cleanup): Standalone placeholders (alone on a line) are optional
+# injection points. Any still unreplaced after all phases are removed silently.
 #
 # Usage: render-prompt.sh <agent-name> <experiment-name>
 # Example: render-prompt.sh skill-tester 20260224-1430
@@ -77,6 +83,28 @@ if os.path.isdir(fixture_dir):
 # file exists it's injected, if not the placeholder disappears.
 template = re.sub(r'\{\{\w+_BRIEFING\}\}\n?', '', template)
 
+# --- Phase 1c: Config file substitution ---
+# Read config.yml for skill-level variables (e.g., skill.path -> {{SKILL_PATH}}).
+harness_dir = os.path.dirname(os.path.dirname(template_path))
+config_path = os.path.join(harness_dir, "config.yml")
+if os.path.isfile(config_path):
+    with open(config_path) as f:
+        section = None
+        for line in f:
+            stripped = line.strip()
+            if not stripped or stripped.startswith("#"):
+                continue
+            if not line[0].isspace() and stripped.endswith(":"):
+                section = stripped[:-1]
+            elif section and line[0].isspace():
+                m = re.match(r'\s+(\w+):\s*(.*)', line)
+                if m:
+                    key = (section + "_" + m.group(1)).upper()
+                    value = m.group(2).strip().strip('"').strip("'")
+                    placeholder = "{{" + key + "}}"
+                    if placeholder in template:
+                        template = template.replace(placeholder, value)
+
 # --- Phase 2: String substitution ---
 # Env vars override hardcoded defaults
 template = template.replace("{{OUTPUT_DIR}}", os.environ.get("OUTPUT_DIR", os.path.join(experiment_path, "output")))
@@ -100,16 +128,26 @@ if os.path.isfile(fixture_env):
                 template = template.replace(placeholder, value)
 
 # --- Phase 3: Env var sweep ---
-# Replace remaining {{VAR}} patterns with matching env vars
+# Replace remaining {{VAR}} patterns with matching env vars.
+# Standalone placeholders (alone on a line) are optional — suppress warnings for
+# those since Phase 4 will clean them up.
+standalone_vars = set(re.findall(r'^\s*\{\{(\w+)\}\}\s*$', template, flags=re.MULTILINE))
+
 def env_replace(match):
     name = match.group(1)
     value = os.environ.get(name)
     if value is not None:
         return value
-    print(f"Warning: unreplaced variable {{{{{name}}}}} (no env var '{name}' set)", file=sys.stderr)
+    if name not in standalone_vars:
+        print(f"Warning: unreplaced variable {{{{{name}}}}} (no env var '{name}' set)", file=sys.stderr)
     return match.group(0)
 
 template = re.sub(r'\{\{(\w+)\}\}', env_replace, template)
+
+# --- Phase 4: Clear standalone optional placeholders ---
+# Placeholders alone on a line are optional injection points (e.g., {{SKILL_TESTER_CONTEXT}}).
+# If still present after all substitution phases, remove the line.
+template = re.sub(r'^\s*\{\{\w+\}\}\s*\n', '', template, flags=re.MULTILINE)
 
 print(template)
 PYEOF
