@@ -9,6 +9,12 @@
       "source": "./",
       "description": "Multi-persona expert review with structured output and synthesis",
       "version": "0.2.0"
+    },
+    {
+      "name": "skill-lab",
+      "source": "./skill-lab",
+      "description": "Build and improve Claude Code skills through test-driven iteration with agent teams",
+      "version": "0.1.0"
     }
   ]
 }

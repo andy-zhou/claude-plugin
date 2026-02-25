@@ -1,0 +1,6 @@
+{
+  "name": "skill-lab",
+  "version": "0.2.0",
+  "description": "Build and improve Claude Code skills through test-driven iteration with agent teams",
+  "keywords": ["skill", "tdd", "testing", "iteration", "agent-teams"]
+}
