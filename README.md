@@ -5,6 +5,7 @@ A Claude Code plugin hosting custom skills. Each skill lives under `skills/{skil
 ## Current Skills
 
 - **subagent-analysis** — Brainstorms context-specific reviewer personas with the user, dispatches them as parallel teammates, facilitates inter-persona debate, and synthesizes findings with debate-first conflict resolution. Requires Claude Code agent teams (experimental).
+- **skill-lab** — Evals-driven development for Claude Code skills. Design test scenarios with planted traps, run experiments with agent teams, and iterate based on structured evaluator reports. See [`skill-lab/README.md`](skill-lab/README.md). Requires Claude Code agent teams (experimental).
 
 ## Installation
 
@@ -65,6 +66,12 @@ andys-skills/
 │   └── plans/
 │       ├── 2026-02-08-agent-teams-migration-design.md
 │       └── 2026-02-08-sign-off-rubrics-design.md
+├── skill-lab/                     # Separate plugin: evals-driven skill development
+│   ├── README.md                  # Documentation and usage guide
+│   ├── init-harness.sh            # Scaffold test infrastructure
+│   ├── guides/                    # Deep-dive guides (scenario design, analysis)
+│   ├── templates/                 # Scripts, subagent prompts, experiment log templates
+│   └── skills/                    # Skill definitions (router + 4 sub-skills)
 └── skills/
     └── subagent-analysis/
         ├── SKILL.md               # Main skill: 9-step review workflow (agent teams + rubric hardening + debate)
