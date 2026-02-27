@@ -40,6 +40,48 @@ The core loop has four steps:
 
 **Experiment lifecycle** — Each experiment runs in an isolated git worktree: setup scripts create the experiment directory and render prompt templates, agents are spawned and monitored, teardown cleans up fixtures, results are committed in the worktree, then merged back to the main branch. Experiment logs are written to `docs/experiment-log/`.
 
+## Subagent Spawning (Orchestration Skills)
+
+Orchestration skills coordinate sub-agents. During experiments, the skill tester can't use the Task tool directly — instead it routes all subagent lifecycle through the team lead via JSON messages:
+
+**Spawning:** The skill tester writes a prompt file to the spawn directory, then sends a `spawn_request` to the team lead with the agent name and prompt path. The team lead spawns the agent with a `sub-` prefix (e.g., `billing` becomes `sub-billing`) to prevent name collisions, and responds with a `spawn_response` containing the namespaced name.
+
+**Communication:** The skill tester messages spawned sub-agents using the namespaced name from the spawn response. Sub-agents write output to `output/subagent-reports/`.
+
+**Shutdown:** The skill tester sends a `terminate_request` when done with a sub-agent. All sub-agents must be terminated before the skill tester finishes. The team lead handles the actual shutdown and confirms with a `terminate_response`.
+
+This protocol is injected into the skill tester's prompt automatically when the skill type is `orchestration` — `/skill-lab-init` copies `spawning-protocol-briefing.md` into the harness, and prompt rendering picks it up.
+
+## Prompt Rendering
+
+Agent prompts are templates with `{{VARIABLE}}` placeholders, rendered in four phases by `render-prompt.sh`:
+
+1. **File content injection** — Any `*-briefing.md` file in the fixture directory is auto-discovered and injected. `evaluator-briefing.md` becomes `{{EVALUATOR_BRIEFING}}`, `spawning-protocol-briefing.md` becomes `{{SPAWNING_PROTOCOL_BRIEFING}}`, etc.
+
+2. **Config substitution** — Values from `harness/config.yml` are mapped to placeholders. `skill.path` becomes `{{SKILL_PATH}}`, `skill.name` becomes `{{SKILL_NAME}}`, etc.
+
+3. **Standard variables + fixtures** — Built-in paths (`{{OUTPUT_DIR}}`, `{{EXPERIMENT_DIR}}`, `{{FIXTURE_DIR}}`, `{{SPAWN_DIR}}`) plus any `KEY=VALUE` pairs from `.fixture-env` (written by `start-fixture.sh` at runtime).
+
+4. **Env var sweep + cleanup** — Remaining placeholders are matched against environment variables. Standalone placeholders (alone on a line) are optional injection points — if unresolved after all phases, they're removed silently.
+
+This means adding a new briefing file to a scenario automatically makes it available in prompts — no configuration needed.
+
+## Fixtures
+
+Scenarios can include executable fixtures for services the skill tester needs during an experiment:
+
+- **`start-fixture.sh`** — Receives the experiment path as an argument. Starts mock servers, generates sample data, or sets up any external dependencies. Writes runtime variables (URLs, ports, PIDs) to `$EXPERIMENT_PATH/fixture/.fixture-env` as `KEY=VALUE` pairs. These become `{{KEY}}` placeholders in prompt templates.
+
+- **`stop-fixture.sh`** — Cleans up after the experiment. `teardown.sh` calls this automatically, and also kills any processes referenced in `.fixture-env` or `.pid` files.
+
+Example `.fixture-env`:
+```
+API_URL=http://localhost:8080
+API_PID=12345
+```
+
+In a prompt template, `{{API_URL}}` would be replaced with `http://localhost:8080`.
+
 ## Deep Dives
 
 - **[Scenario Design Guide](guides/scenario-design.md)** — Trap categories (structural, naming, behavioral, scope, relationship, documentation), rubric best practices, anti-patterns, and calibration by skill type.
